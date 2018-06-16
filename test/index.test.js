@@ -4,14 +4,14 @@ const jarvis = new Jarvis();
 
 jarvis.addCommand({
   command: 'test',
-  handler: async (context, data) => {
+  handler: (context, data) => {
     return 'tested: ' + data;
   }
 });
 
 jarvis.addCommand({
   command: 'test2',
-  handler: async (context, data) => {
+  handler: (context, data) => {
     if (context.activeCommand === null) {
       context.start('test2');
       context.setState({status: 'awaitInput'});

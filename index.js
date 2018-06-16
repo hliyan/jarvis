@@ -12,7 +12,13 @@ class Jarvis {
    * USAGE: jarvis.addCommand({ command: 'test', handler: () => {}});
    */
   addCommand({command, handler}) {
-    this.commands[command] = {command, handler};
+    const asyncHanlder = async (context, data ) => {
+      return handler(context, data);
+    };
+    this.commands[command] = {
+      command: command, 
+      handler: asyncHanlder
+    };
   }
 
   /**
