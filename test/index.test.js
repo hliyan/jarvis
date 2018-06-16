@@ -90,11 +90,34 @@ describe('command with variables', () => {
       handler: ({tokens, variables}) => {
         expect(tokens).toEqual(['say', 'hello', 'to', 'John Doe', 'now']);
         expect(variables).toEqual({name: 'John Doe'});
-        return `Hello ${tokens[3]}`;
+        return `Hello ${variables.name}`;
       }
     });
 
     expect(await jarvis.send('say hello to "John Doe" now'))
+      .toEqual('Hello John Doe');
+  });
+});
+
+describe('aliases', () => {
+  const jarvis = new Jarvis();
+  jarvis.addCommand({
+    command: 'greet <name>',
+    aliases: [
+      'hello <name> how are you'
+    ],
+    handler: ({variables}) => {
+      return `Hello ${variables.name}`;
+    }
+  });
+
+  test('should match main command', async () => {
+    expect(await jarvis.send('greet "John Doe"'))
+      .toEqual('Hello John Doe');
+  });
+
+  test('should match alias', async () => {
+    expect(await jarvis.send('hello "John Doe" how are you'))
       .toEqual('Hello John Doe');
   });
 });
