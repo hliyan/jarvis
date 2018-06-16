@@ -25,8 +25,8 @@ class Jarvis {
    * To be called only by command handlers, to indicate the start of
    * an interactive shell session
    */
-  startCommand(command) {
-    this.activeCommand = this._findCommand(command);
+  startCommand(commandName) {
+    this.activeCommand = this._findCommand(commandName);
   }
 
   /**
@@ -56,9 +56,15 @@ class Jarvis {
   }
 
   async _runCommand(command, line) {
+    let args = [];
+    const words = line.match(/\w+|"[^"]+"/g);
+    words.forEach((word) => {
+      args.push(word.replace(/"/g));
+    });
     return await command.handler({
       context: this,
-      line: line
+      line,
+      args
     });
   }
 

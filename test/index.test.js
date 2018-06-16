@@ -51,4 +51,32 @@ describe('interactive command', async () => {
   });
 });
 
+describe('static phrase command', () => {
+  const jarvis = new Jarvis();
+  jarvis.addCommand({
+    command: 'how are you',
+    handler: ({line, args}) => {
+      return 'I\'m fine';
+    }
+  });
 
+  test('should match the phrase exactly', async () => {
+    expect(await jarvis.send('how are you')).toEqual('I\'m fine');
+    expect(await jarvis.send('how are')).toEqual(null);
+  });
+});
+
+describe('command handler', () => {
+  const jarvis = new Jarvis();
+
+  test('should receive argument array', async () => {
+    jarvis.addCommand({
+      command: 'how are you',
+      handler: ({line, args}) => {
+        expect(args).toEqual(['how', 'are', 'you']);
+        return 'I\'m fine';
+      }
+    });
+    await jarvis.send('how are you');
+  });
+});
