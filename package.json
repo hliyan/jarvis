@@ -2,9 +2,9 @@
   "name": "jarvis",
   "version": "1.0.0",
   "description": "J.A.R.V.I.S - Just Another Reusable Verbal Interpreter Shell",
-  "main": "index.js",
+  "main": "./index.js",
   "directories": {
-    "test": "test"
+    "lib": "./"
   },
   "scripts": {
     "test": "jest --coverage"
