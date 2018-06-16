@@ -59,7 +59,7 @@ class Jarvis {
     let args = [];
     const words = line.match(/\w+|"[^"]+"/g);
     words.forEach((word) => {
-      args.push(word.replace(/"/g));
+      args.push(word.replace(/"/g, ''));
     });
     return await command.handler({
       context: this,

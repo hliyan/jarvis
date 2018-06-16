@@ -73,10 +73,10 @@ describe('command handler', () => {
     jarvis.addCommand({
       command: 'how are you',
       handler: ({line, args}) => {
-        expect(args).toEqual(['how', 'are', 'you']);
+        expect(args).toEqual(['how', 'are', 'you', 'doing', 'John Doe']);
         return 'I\'m fine';
       }
     });
-    await jarvis.send('how are you');
+    await jarvis.send('how are you doing "John Doe"');
   });
 });
