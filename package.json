@@ -1,0 +1,22 @@
+{
+  "name": "jarvis",
+  "version": "1.0.0",
+  "description": "J.A.R.V.I.S - Just Another Reusable Verbal Interpreter Shell",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hliyan/jarvis.git"
+  },
+  "author": "Hasitha N. Liyanage",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hliyan/jarvis/issues"
+  },
+  "homepage": "https://github.com/hliyan/jarvis#readme"
+}
