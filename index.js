@@ -1,5 +1,13 @@
 // jarvis, just another reusable verbal interpreter shell
 
+const tokenize = (line) => {
+  const tokens = line.match(/\w+|"[^"]+"/g);
+  for (let i = 0; i < tokens.length; i++) {
+    tokens[i] = tokens[i].replace(/"/g, '');
+  }
+  return tokens;
+};
+
 class Jarvis {
   constructor() {
     this.commands = []; // list of registered commands
@@ -17,7 +25,8 @@ class Jarvis {
     };
     this.commands.push({
       command: command, 
-      handler: asyncHanlder
+      handler: asyncHanlder,
+      tokens: tokenize(command)
     });
   }
 
@@ -46,25 +55,28 @@ class Jarvis {
     Object.assign(this.state, data);
   }
 
-  _findCommand(data) {
-    let found = null;
-    this.commands.forEach((command) => {
-      if (data.includes(command.command))
-        found = command;
-    });
-    return found;
+  _findCommand(line) {
+    const tokens = tokenize(line);
+    for (let i = 0; i < this.commands.length; i++) {
+      const command = this.commands[i];
+      let match = true;
+      for (let j = 0; j < command.tokens.length; j++) {
+        if (tokens[j] !== command.tokens[j]) {
+          match = false;
+          break;
+        }
+      }
+      if (match)
+        return command;
+    }
+    return null;
   }
 
   async _runCommand(command, line) {
-    let args = [];
-    const words = line.match(/\w+|"[^"]+"/g);
-    words.forEach((word) => {
-      args.push(word.replace(/"/g, ''));
-    });
     return await command.handler({
       context: this,
       line,
-      args
+      args: tokenize(line)
     });
   }
 
