@@ -1,4 +1,4 @@
-const Jarvis = require('../src/index');
+const Jarvis = require('../index');
 
 const jarvis = new Jarvis();
 
