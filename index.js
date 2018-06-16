@@ -41,7 +41,7 @@ class Jarvis {
   }
 
   /**
-   * Sends a response back to the sender of the command
+   * Sends a command to the shell
    */
   async send(data) {
     if (this.activeCommand) {
