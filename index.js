@@ -2,7 +2,7 @@
 
 class Jarvis {
   constructor() {
-    this.commands = {}; // list of registered commands
+    this.commands = []; // list of registered commands
     this.activeCommand = null; // currently active command
     this.state = {}; // state variables for currently active command
   }
@@ -15,10 +15,10 @@ class Jarvis {
     const asyncHanlder = async (context, data) => {
       return handler(context, data);
     };
-    this.commands[command] = {
+    this.commands.push({
       command: command, 
       handler: asyncHanlder
-    };
+    });
   }
 
   /**
@@ -47,11 +47,12 @@ class Jarvis {
   }
 
   _findCommand(data) {
-    for (let c in this.commands) {
-      if (data === c || data.includes(c)) {
-        return this.commands[c];
-      }
-    }
+    let found = null;
+    this.commands.forEach((command) => {
+      if (data.includes(command.command))
+        found = command;
+    });
+    return found;
   }
 
   /**

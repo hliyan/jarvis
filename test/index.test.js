@@ -20,7 +20,6 @@ jarvis.addCommand({
 
     if (context.state.status === 'awaitInput') {
       const out = 'Handled: ' + data;
-      //context.endCommand();
       return out;
     }
 
