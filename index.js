@@ -23,10 +23,17 @@ class Jarvis {
     const asyncHanlder = async (data) => {
       return handler(data);
     };
+    const tokens = [];
+    command.split(' ').forEach((token) => {
+      tokens.push({
+        value: token.replace(/<|>/g, ''),
+        variable: token.includes('<')
+      });
+    });
     this.commands.push({
       command: command, 
       handler: asyncHanlder,
-      tokens: tokenize(command)
+      tokens: tokens
     });
   }
 
@@ -61,7 +68,8 @@ class Jarvis {
       const command = this.commands[i];
       let match = true;
       for (let j = 0; j < command.tokens.length; j++) {
-        if (tokens[j] !== command.tokens[j]) {
+        const commandToken = command.tokens[j];
+        if (!commandToken.variable && (tokens[j] !== commandToken.value)) {
           match = false;
           break;
         }
@@ -73,10 +81,20 @@ class Jarvis {
   }
 
   async _runCommand(command, line) {
+    const tokens = tokenize(line);
+    const variables = {};
+    
+    for (let i = 0; i < command.tokens.length; i++) {
+      if (command.tokens[i].variable) {
+        variables[command.tokens[i].value] = tokens[i];
+      }
+    }
+
     return await command.handler({
       context: this,
       line,
-      args: tokenize(line)
+      tokens,
+      variables
     });
   }
 

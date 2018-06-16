@@ -72,11 +72,29 @@ describe('command handler', () => {
   test('should receive argument array', async () => {
     jarvis.addCommand({
       command: 'how are you',
-      handler: ({line, args}) => {
-        expect(args).toEqual(['how', 'are', 'you', 'doing', 'John Doe']);
+      handler: ({line, tokens}) => {
+        expect(tokens).toEqual(['how', 'are', 'you', 'doing', 'John Doe']);
         return 'I\'m fine';
       }
     });
     await jarvis.send('how are you doing "John Doe"');
+  });
+});
+
+describe('command with variables', () => {
+  const jarvis = new Jarvis();
+
+  test('should match with variables', async () => {
+    jarvis.addCommand({
+      command: 'say hello to <name> now',
+      handler: ({tokens, variables}) => {
+        expect(tokens).toEqual(['say', 'hello', 'to', 'John Doe', 'now']);
+        expect(variables).toEqual({name: 'John Doe'});
+        return `Hello ${tokens[3]}`;
+      }
+    });
+
+    expect(await jarvis.send('say hello to "John Doe" now'))
+      .toEqual('Hello John Doe');
   });
 });
