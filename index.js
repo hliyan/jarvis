@@ -55,21 +55,28 @@ class Jarvis {
     return found;
   }
 
+  async _runCommand(command, line) {
+    return await command.handler({
+      context: this,
+      line: line
+    });
+  }
+
   /**
    * Sends a command to the shell
    */
-  async send(data) {
+  async send(line) {
     if (this.activeCommand) {
-      if (data === '..') {
+      if (line === '..') {
         const out = 'Done with ' + this.activeCommand.command + '.';
         this.endCommand();
         return out;
       }
-      return await this.activeCommand.handler({context: this, data: data});
+      return this._runCommand(this.activeCommand, line);
     }
 
-    const command = this._findCommand(data);
-    return command ? await command.handler({context: this, data: data}): null;
+    const command = this._findCommand(line);
+    return command ? this._runCommand(command, line) : null;
   }
 }
 
