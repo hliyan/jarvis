@@ -4,7 +4,7 @@ describe('basic command', async () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
     command: 'simple',
-    handler: (context, data) => {
+    handler: ({state, data}) => {
       return 'tested: ' + data;
     }
   });
@@ -23,7 +23,7 @@ describe('interactive command', async () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
     command: 'repl',
-    handler: (context, data) => {
+    handler: ({context, data}) => {
       if (!context.activeCommand) {
         context.startCommand('repl');
         context.setCommandState({status: 'awaitInput'});

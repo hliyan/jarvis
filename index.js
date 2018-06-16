@@ -12,8 +12,8 @@ class Jarvis {
    * USAGE: jarvis.addCommand({ command: 'test', handler: () => {}});
    */
   addCommand({command, handler}) {
-    const asyncHanlder = async (context, data) => {
-      return handler(context, data);
+    const asyncHanlder = async (data) => {
+      return handler(data);
     };
     this.commands.push({
       command: command, 
@@ -65,11 +65,11 @@ class Jarvis {
         this.endCommand();
         return out;
       }
-      return await this.activeCommand.handler(this, data);
+      return await this.activeCommand.handler({context: this, data: data});
     }
 
     const command = this._findCommand(data);
-    return command ? await command.handler(this, data): null;
+    return command ? await command.handler({context: this, data: data}): null;
   }
 }
 
