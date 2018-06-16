@@ -12,7 +12,7 @@ class Jarvis {
    * USAGE: jarvis.addCommand({ command: 'test', handler: () => {}});
    */
   addCommand({command, handler}) {
-    const asyncHanlder = async (context, data ) => {
+    const asyncHanlder = async (context, data) => {
       return handler(context, data);
     };
     this.commands[command] = {
@@ -25,15 +25,15 @@ class Jarvis {
    * To be called only by command handlers, to indicate the start of
    * an interactive shell session
    */
-  start(command) {
-    this.activeCommand = command;
+  startCommand(command) {
+    this.activeCommand = this._findCommand(command);
   }
 
   /**
    * To be called only by command handlers, to indicate the end of
    * an interactive shell session
    */
-  end() {
+  endCommand() {
     this.activeCommand = null;
     this.state = {};
   }
@@ -42,8 +42,16 @@ class Jarvis {
    * To be called only by command handlers for an interactive shell command
    * Can be used to set variables for the duration of that shell command
    */
-  setState(data) {
+  setCommandState(data) {
     Object.assign(this.state, data);
+  }
+
+  _findCommand(data) {
+    for (let c in this.commands) {
+      if (data === c) {
+        return this.commands[c];
+      }
+    }
   }
 
   /**
@@ -52,19 +60,15 @@ class Jarvis {
   async send(data) {
     if (this.activeCommand) {
       if (data === '..') {
-        const out = 'Done with ' + this.activeCommand + '.';
-        this.end();
+        const out = 'Done with ' + this.activeCommand.command + '.';
+        this.endCommand();
         return out;
       }
-      return await this.commands[this.activeCommand].handler(this, data);
+      return await this.activeCommand.handler(this, data);
     }
 
-    for (let c in this.commands) {
-      if (data === c || (data.indexOf(c) == 0 && data[c.length] == ' ')) {
-        return await this.commands[c].handler(this, data);
-      }
-    }
-    return null;
+    const command = this._findCommand(data);
+    return command ? await command.handler(this, data): null;
   }
 }
 
