@@ -48,7 +48,7 @@ class Jarvis {
 
   _findCommand(data) {
     for (let c in this.commands) {
-      if (data === c) {
+      if (data === c || data.includes(c)) {
         return this.commands[c];
       }
     }
