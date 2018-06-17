@@ -81,16 +81,16 @@ describe('command handler', () => {
   });
 });
 
-describe('command with variables', () => {
+describe('command with args', () => {
   const jarvis = new Jarvis();
 
   test('should match with variables', async () => {
     jarvis.addCommand({
       command: 'say hello to <name> now',
-      handler: ({tokens, variables}) => {
+      handler: ({tokens, args}) => {
         expect(tokens).toEqual(['say', 'hello', 'to', 'John Doe', 'now']);
-        expect(variables).toEqual({name: 'John Doe'});
-        return `Hello ${variables.name}`;
+        expect(args).toEqual({name: 'John Doe'});
+        return `Hello ${args.name}`;
       }
     });
 
@@ -106,8 +106,8 @@ describe('aliases', () => {
     aliases: [
       'hello <name> how are you'
     ],
-    handler: ({variables}) => {
-      return `Hello ${variables.name}`;
+    handler: ({args}) => {
+      return `Hello ${args.name}`;
     }
   });
 

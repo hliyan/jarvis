@@ -10,30 +10,30 @@ const tokenize = (line) => {
 };
 
 // converts 'hello <name>' to 
-// [{value: 'hello', variable: false}, {value: name, variable: true}]
+// [{value: 'hello', isArg: false}, {value: name, isArg: true}]
 const idTokens = (commandStr) => {
   const tokens = [];
   commandStr.split(' ').forEach((token) => {
     tokens.push({
       value: token.replace(/<|>/g, ''),
-      variable: token.includes('<')
+      isArg: token.includes('<')
     });
   });
   return tokens;
 };
 
 // checks tokens against all the patterns in the command
-// returns variables if match, else null
+// returns args if match, else null
 const parse = (command, inputTokens) => {
   for (let i = 0; i < command.patterns.length; i++) { // for each pattern
     const patternTokens = command.patterns[i].tokens;
-    const variables = {};
+    const args = {};
 
     let match = true;
     for (let j = 0; j < patternTokens.length; j++) { // for each token in pattern
       const patternToken = patternTokens[j];
-      if (patternToken.variable) {
-        variables[patternToken.value] = inputTokens[j]; 
+      if (patternToken.isArg) {
+        args[patternToken.value] = inputTokens[j]; 
       } else {
         if (inputTokens[j] !== patternToken.value) {
           match = false;
@@ -42,7 +42,7 @@ const parse = (command, inputTokens) => {
       }
     }
     if (match)
-      return {variables};  
+      return {args};  
   }
   return null;
 };
@@ -124,7 +124,7 @@ class Jarvis {
       context: this,
       line,
       tokens: inputTokens,
-      variables: command ? parse(command, inputTokens).variables : {}
+      args: command ? parse(command, inputTokens).args : {}
     });
   }
 
