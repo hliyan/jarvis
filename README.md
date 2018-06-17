@@ -77,8 +77,8 @@ rl.on('line', async (line) => {
 ```
 
 Running:
-```bash
-~/personal/src/hliyan/jarvis-sample-app $ node index.js
+```shell
+$ node index.js
 jarvis> who is the president of russia
   the president of russia is Vladamir Putin
 jarvis> usa president
