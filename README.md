@@ -37,7 +37,7 @@ const res = await app.send('connect to hliyan/jarvis');
 console.log(res); // "Connected to hliyan/jarvis."
 ```
 
-# Command line integration
+## Command line integration
 
 * Full source: [hliyan/jarvis-sample-app](https://github.com/hliyan/jarvis-sample-app)
 
