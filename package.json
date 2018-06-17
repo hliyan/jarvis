@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/hliyan/jarvis/issues"
   },
-  "homepage": "https://github.com/hliyan/jarvis#readme"
+  "homepage": "https://github.com/hliyan/jarvis#readme",
+  "devDependencies": {
+    "jest": "^23.1.0"
+  }
 }
