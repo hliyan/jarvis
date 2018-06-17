@@ -17,8 +17,8 @@ app.addCommand({
   command: 'connectToRepository <repoName>',
   aliases: [
     'connect to <repoName>',
-    'president of <country>', 
-    '<country> president'
+    'connect repo <repoName>',
+    'connect to <repoName> repo'
   ],
   handler: async ({args: {repoName}}) => {
     const res = await client.connect(repoName);
