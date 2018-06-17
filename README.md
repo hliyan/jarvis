@@ -14,12 +14,13 @@ npm install --save hliyan/jarvis
 
 ```javascript
 
-const Jarvis = require('jarvis');
-const IssueClient = require('issue-client'); // assume you already have this
+const Jarvis = require('jarvis');            // use jarvis to
+const IssueClient = require('issue-client'); // wrap this with a basic english API
 
 const app = new Jarvis();
 const client = new IssueClient();
 
+// register command
 app.addCommand({
   command: 'connectToRepository <repoName>',
   aliases: [
@@ -33,6 +34,7 @@ app.addCommand({
   }
 });
 
+// exercise the command
 const res = await app.send('connect to hliyan/jarvis');
 console.log(res); // "Connected to hliyan/jarvis."
 ```
@@ -96,4 +98,35 @@ jarvis> foo
 jarvis> 
 ```
 
+## Interactive CLI
 
+You can enter an interactive command session using `jarvis.startCommand(<name>)` and exit that particular session using `jarvis.endCommand()`. State that needs to be maintained for the duration of the interactive session can be set using `jarvis.setCommandState(<object>)`.
+
+```javascript
+  const jarvis = new Jarvis();
+  jarvis.addCommand({
+    command: 'repl',
+    handler: ({context, line}) => {
+      if (!context.activeCommand) {
+        context.startCommand('repl');
+        context.setCommandState({status: 'awaitInput'});
+        return 'Enter input: ';
+      }
+  
+      if (context.state.status === 'awaitInput') {
+        const out = 'Handled: ' + line;
+        return out;
+      }
+    }
+  });
+```
+
+Expected output
+```
+$ repl
+$ Enter input:
+$ bar
+$ Handled: bar
+$ ..  # built in exit
+$ Done with repl.
+```
