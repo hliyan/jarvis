@@ -4,7 +4,13 @@
 
 * JARVIS helps you write rudimentary English wrappers around libraries or APIs
 
-# Basic example
+## Installation
+
+```
+npm install --save hliyan/jarvis
+```
+
+## Basic example: wrapping an existing library
 
 ```javascript
 
