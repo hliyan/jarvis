@@ -1,3 +1,5 @@
+![build](https://travis-ci.org/hliyan/jarvis.svg?branch=master)
+
 # J.A.R.V.I.S - Just Another Rudimentary Verbal Interface Shell
 
 * JARVIS helps you write rudimentary English wrappers around libraries or APIs
