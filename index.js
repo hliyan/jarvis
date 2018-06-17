@@ -1,51 +1,8 @@
-// jarvis, just another rudimentary verbal interface shell
-
-// converts 'hello "John Doe"' to ['hello', 'John, Doe']
-const tokenize = (line) => {
-  const tokens = line.match(/\w+|"[^"]+"/g);
-  for (let i = 0; i < tokens.length; i++) {
-    tokens[i] = tokens[i].replace(/"/g, '');
-  }
-  return tokens;
-};
-
-// converts 'hello <name>' to 
-// [{value: 'hello', isArg: false}, {value: name, isArg: true}]
-const idTokens = (commandStr) => {
-  const tokens = [];
-  commandStr.split(' ').forEach((token) => {
-    tokens.push({
-      value: token.replace(/<|>/g, ''),
-      isArg: token.includes('<')
-    });
-  });
-  return tokens;
-};
-
-// checks tokens against all the patterns in the command
-// returns args if match, else null
-const parse = (command, inputTokens) => {
-  for (let i = 0; i < command.patterns.length; i++) { // for each pattern
-    const patternTokens = command.patterns[i].tokens;
-    const args = {};
-
-    let match = true;
-    for (let j = 0; j < patternTokens.length; j++) { // for each token in pattern
-      const patternToken = patternTokens[j];
-      if (patternToken.isArg) {
-        args[patternToken.value] = inputTokens[j]; 
-      } else {
-        if (inputTokens[j] !== patternToken.value) {
-          match = false;
-          break;
-        }
-      }
-    }
-    if (match)
-      return {args};  
-  }
-  return null;
-};
+const { 
+  parseCommand, 
+  tokenize, 
+  parseInputTokens 
+} = require("./src/utils");
 
 class Jarvis {
   constructor() {
@@ -60,17 +17,17 @@ class Jarvis {
    */
   addCommand({command, handler, aliases}) {
     const patterns = [];
-    patterns.push({tokens: idTokens(command)});
+    patterns.push({tokens: parseCommand(command)});
     if (aliases) {
       aliases.forEach((alias) => {
-        patterns.push({tokens: idTokens(alias)})
+        patterns.push({tokens: parseCommand(alias)})
       });
     }
 
     this.commands.push({
       command: command, 
       handler: handler,
-      tokens: idTokens(command),
+      tokens: parseCommand(command),
       patterns
     });
   }
@@ -104,7 +61,7 @@ class Jarvis {
     const inputTokens = tokenize(line);
     for (let i = 0; i < this.commands.length; i++) {
       const command = this.commands[i];
-      if (parse(command, inputTokens))
+      if (parseInputTokens(command, inputTokens))
         return command;
     }
     return null;
@@ -120,7 +77,7 @@ class Jarvis {
       context: this,
       line,
       tokens: inputTokens,
-      args: command ? parse(command, inputTokens).args : {}
+      args: command ? parseInputTokens(command, inputTokens).args : {}
     });
   }
 
