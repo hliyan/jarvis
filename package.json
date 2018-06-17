@@ -7,7 +7,7 @@
     "lib": "./"
   },
   "scripts": {
-    "test": "jest --maxWorkers=4 --coverage"
+    "test": "jest --maxWorkers=4 --coverage --coverageReporters=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/hliyan/jarvis#readme",
   "devDependencies": {
+    "coveralls": "^3.0.1",
     "jest": "^23.1.0"
   }
 }
