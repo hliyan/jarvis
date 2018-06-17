@@ -33,6 +33,8 @@ console.log(res); // "Connected to hliyan/jarvis."
 
 # Command line integration
 
+* Full source: [hliyan/jarvis-sample-app](https://github.com/hliyan/jarvis-sample-app)
+
 ```javascript
 const FAQClient = require('./faq');   // business logic from here
 const Jarvis = require('jarvis');     // wrapped by jarvis 
@@ -74,4 +76,18 @@ rl.on('line', async (line) => {
 // TODO: error handling and other best practices
 ```
 
-* See: [hliyan/jarvis-sample-app](https://github.com/hliyan/jarvis-sample-app)
+Running:
+```bash
+~/personal/src/hliyan/jarvis-sample-app $ node index.js
+jarvis> who is the president of russia
+  the president of russia is Vladamir Putin
+jarvis> usa president
+  the president of usa is Barack Obama
+jarvis> us president
+  i don't know us
+jarvis> foo
+  I don't understand
+jarvis> 
+```
+
+
