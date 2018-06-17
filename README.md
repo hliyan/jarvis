@@ -1,6 +1,7 @@
 # J.A.R.V.I.S - Just Another Rudimentary Verbal Interface Shell
 
-![build](https://travis-ci.org/hliyan/jarvis.svg?branch=master)
+![build](https://travis-ci.org/hliyan/jarvis.svg?branch=master) 
+[![Coverage Status](https://coveralls.io/repos/github/hliyan/jarvis/badge.svg?branch=master)](https://coveralls.io/github/hliyan/jarvis?branch=master)
 
 * JARVIS helps you write rudimentary English wrappers around libraries or APIs
 
