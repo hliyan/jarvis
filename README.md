@@ -3,9 +3,8 @@
 ![build](https://travis-ci.org/hliyan/jarvis.svg?branch=master)
 
 * JARVIS helps you write rudimentary English wrappers around libraries or APIs
-* For an example, see: [hliyan/jarvis-sample-app](https://github.com/hliyan/jarvis-sample-app)
 
-# Example
+# Basic example
 
 ```javascript
 
@@ -31,3 +30,7 @@ app.addCommand({
 const res = await app.send('connect to hliyan/jarvis');
 console.log(res); // "Connected to hliyan/jarvis."
 ```
+
+# Example integrated with a command line
+
+* See: [hliyan/jarvis-sample-app](https://github.com/hliyan/jarvis-sample-app)
