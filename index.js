@@ -1,4 +1,4 @@
-// jarvis, just another reusable verbal interpreter shell
+// jarvis, just another rudimentary verbal interface shell
 
 // converts 'hello "John Doe"' to ['hello', 'John, Doe']
 const tokenize = (line) => {
@@ -59,10 +59,6 @@ class Jarvis {
    * USAGE: jarvis.addCommand({ command: 'test', handler: () => {}});
    */
   addCommand({command, handler, aliases}) {
-    const asyncHanlder = async (data) => {
-      return handler(data);
-    };
-
     const patterns = [];
     patterns.push({tokens: idTokens(command)});
     if (aliases) {
@@ -73,7 +69,7 @@ class Jarvis {
 
     this.commands.push({
       command: command, 
-      handler: asyncHanlder,
+      handler: handler,
       tokens: idTokens(command),
       patterns
     });
