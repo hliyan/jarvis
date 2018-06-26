@@ -1,7 +1,7 @@
 // jarvis, just another rudimentary verbal interface shell
 // converts 'hello "John Doe"' to ['hello', 'John, Doe']
 const tokenize = (line) => {
-  const tokens = line.match(/\w+|"[^"]+"/g);
+  const tokens = line.match(/"([^"]+)"|\S+/g);
   for (let i = 0; i < tokens.length; i++) {
     tokens[i] = tokens[i].replace(/"/g, '');
   }
