@@ -131,3 +131,31 @@ $ Handled: bar
 $ ..  # built in exit
 $ Done with repl.
 ```
+
+## Script mode
+
+(To be implemented)
+
+Create a script file, e.g.
+
+```
+connect to repo 'hliyan/jarvis'
+get open issues
+write issues to 'home/john/issues.json'
+```
+
+Create a script runner with the correct bindings
+
+```
+const Jarvis = require('jarvis');
+const app = new Jarvis();
+
+// bind commands as described earlier
+
+// run script
+app.run('test.jarvis', function(input, output) {
+  console.log(input);
+  console.log(output);
+});
+
+```
