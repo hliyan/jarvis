@@ -3,7 +3,27 @@
 ![build](https://travis-ci.org/hliyan/jarvis.svg?branch=master) 
 [![Coverage Status](https://coveralls.io/repos/github/hliyan/jarvis/badge.svg?branch=master)](https://coveralls.io/github/hliyan/jarvis?branch=master)
 
-* JARVIS helps you write rudimentary English wrappers around libraries or APIs
+## Introduction
+
+JARVIS helps you write rudimentary English wrappers around libraries or APIs, like this:
+
+```javascript
+// wrap you JavaScript function with an English API:
+jarvis.addCommand({
+  command: '<number> to the power of <power>',
+  handler: ({args: {number, power}}) => {
+    const result = Math.pow(parseInt(number), parseInt(power));
+    return `${number} to the power of ${power} is ${result}!`;
+  }
+});
+```
+
+Use it from an interactive command line prompt
+
+```shell
+> 2 to the power of 3
+  2 to the power of 3 is 8!
+```
 
 ## Installation
 
@@ -12,6 +32,8 @@ npm install --save hliyan/jarvis
 ```
 
 ## Basic example: wrapping an existing library
+
+Invoke an API using natural language.
 
 ```javascript
 
@@ -42,7 +64,7 @@ console.log(res); // "Connected to hliyan/jarvis."
 
 ## Command line integration
 
-* Full source: [hliyan/jarvis-sample-app](https://github.com/hliyan/jarvis-sample-app)
+Invoke an API using natural language, as a shell command.
 
 ```javascript
 const FAQClient = require('./faq');   // business logic from here
@@ -99,7 +121,11 @@ jarvis> foo
 jarvis> 
 ```
 
+* Full source: [hliyan/jarvis-sample-app](https://github.com/hliyan/jarvis-sample-app)
+
 ## Interactive CLI
+
+Use this when the workflow you're trying to wrap is too complicated to execute as a single line command.
 
 You can enter an interactive command session using `jarvis.startCommand(<name>)` and exit that particular session using `jarvis.endCommand()`. State that needs to be maintained for the duration of the interactive session can be set using `jarvis.setCommandState(<object>)`.
 
@@ -132,9 +158,9 @@ $ ..  # built in exit
 $ Done with repl.
 ```
 
-## Script mode
+## Script mode (TBD)
 
-(To be implemented)
+You can use this to run your natural language commands as a script.
 
 Create a script file, e.g.
 
@@ -159,3 +185,7 @@ app.run('test.jarvis', function(input, output) {
 });
 
 ```
+
+## Macros (TBD)
+
+You can use this to re-use blocks of commands within a script.
