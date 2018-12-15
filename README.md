@@ -186,6 +186,26 @@ app.run('test.jarvis', function(input, output) {
 
 ```
 
-## Macros (TBD)
+## Constants (TBD)
+
+```
+in this context
+  HOME is 'https://foo.bar.com'
+  USER is 'john'
+```
+
+## Macros and variables (TBD)
 
 You can use this to re-use blocks of commands within a script.
+
+```
+in this context
+  PI is 3.14
+
+how to get area of circle with radius <radius>
+  # more statements here
+end
+```
+
+
+
