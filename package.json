@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/hliyan/jarvis#readme",
   "devDependencies": {
-    "coveralls": "^3.0.1",
-    "jest": "^23.1.0"
+    "coveralls": "^3.0.2",
+    "jest": "^23.6.0"
   }
 }
