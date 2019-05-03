@@ -1,12 +1,9 @@
-const { 
-  parseCommand, 
-  tokenize, 
-  parseInputTokens 
-} = require("./src/utils");
+const { parseCommand, tokenize, parseInputTokens } = require("./src/utils");
 
 class Jarvis {
   constructor() {
     this.commands = []; // list of registered commands
+    this.macros = []; //list of macros
     this.activeCommand = null; // currently active command
     this.state = {}; // state variables for currently active command
   }
@@ -15,21 +12,51 @@ class Jarvis {
    * Registers a new command with Jarvis
    * USAGE: jarvis.addCommand({ command: 'test', handler: () => {}});
    */
-  addCommand({command, handler, aliases}) {
+  addCommand({ command, handler, aliases }) {
     const patterns = [];
-    patterns.push({tokens: parseCommand(command)});
+    patterns.push({ tokens: parseCommand(command) });
     if (aliases) {
-      aliases.forEach((alias) => {
-        patterns.push({tokens: parseCommand(alias)})
+      aliases.forEach(alias => {
+        patterns.push({ tokens: parseCommand(alias) });
       });
     }
 
     this.commands.push({
-      command: command, 
+      command: command,
       handler: handler,
       tokens: parseCommand(command),
       patterns
     });
+  }
+
+  /**
+   * Registers a new macro with Jarvis
+   * USAGE: jarvis.addMacro({ macro: 'login',
+   *          commandList:['launch chrome','open google.lk'] });
+   */
+  addMacro({ macro, commandList }) {
+    this.macros.push({
+      macro: macro,
+      commandList: commandList
+    });
+  }
+
+  /**
+   * Run a  predefined macro
+   * USAGE: jarvis.runMacro('login') 
+   */
+  async runMacro(macro) {
+    const commandList = this._findMacro(macro);
+    var promises = [];
+    if (commandList) {
+      await commandList.forEach(async line => {
+        const command = this._findCommand(line);
+        const promise = command ? this._runCommand(command, line) : null;
+        promises.push(promise);
+      });
+    }
+
+    return Promise.all(promises);
   }
 
   /**
@@ -61,8 +88,17 @@ class Jarvis {
     const inputTokens = tokenize(line);
     for (let i = 0; i < this.commands.length; i++) {
       const command = this.commands[i];
-      if (parseInputTokens(command, inputTokens))
-        return command;
+      if (parseInputTokens(command, inputTokens)) return command;
+    }
+    return null;
+  }
+
+  _findMacro(macro) {
+    this.macros.filter(()=>{
+
+    })
+    for (let i = 0; i < this.macros.length; i++) {
+      if (macro === this.macros[i].macro) return this.macros[i].commandList;
     }
     return null;
   }
@@ -86,14 +122,13 @@ class Jarvis {
    */
   async send(line) {
     if (this.activeCommand) {
-      if (line === '..') {
-        const out = 'Done with ' + this.activeCommand.command + '.';
+      if (line === "..") {
+        const out = "Done with " + this.activeCommand.command + ".";
         this.endCommand();
         return out;
       }
       return this._runCommand(null, line);
     }
-
     const command = this._findCommand(line);
     return command ? this._runCommand(command, line) : null;
   }
