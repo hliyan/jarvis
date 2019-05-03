@@ -45,17 +45,26 @@ class Jarvis {
    * Run a  predefined macro
    * USAGE: jarvis.runMacro('login')
    */
+  // async runMacro(macro) {
+  //   const commandList = this._findMacro(macro);
+  //   var promises = [];
+  //   if (commandList) {
+  //     await commandList.forEach(async line => {
+  //       const promise = this.send(line);
+  //       promises.push(promise);
+  //     });
+  //   }
+
+  //   return Promise.all(promises);
+  // }
+
   async runMacro(macro) {
     const commandList = this._findMacro(macro);
-    var promises = [];
     if (commandList) {
-      await commandList.forEach(async line => {
-        const promise = this.send(line);
-        promises.push(promise);
+      commandList.forEach(async line => {
+        await this.send(line);
       });
     }
-
-    return Promise.all(promises);
   }
 
   /**
