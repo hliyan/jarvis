@@ -43,15 +43,14 @@ class Jarvis {
 
   /**
    * Run a  predefined macro
-   * USAGE: jarvis.runMacro('login') 
+   * USAGE: jarvis.runMacro('login')
    */
   async runMacro(macro) {
     const commandList = this._findMacro(macro);
     var promises = [];
     if (commandList) {
       await commandList.forEach(async line => {
-        const command = this._findCommand(line);
-        const promise = command ? this._runCommand(command, line) : null;
+        const promise = this.send(line);
         promises.push(promise);
       });
     }
@@ -94,9 +93,7 @@ class Jarvis {
   }
 
   _findMacro(macro) {
-    this.macros.filter(()=>{
-
-    })
+    this.macros.filter(() => {});
     for (let i = 0; i < this.macros.length; i++) {
       if (macro === this.macros[i].macro) return this.macros[i].commandList;
     }
