@@ -121,3 +121,41 @@ describe('aliases', () => {
       .toEqual('Hello John Doe');
   });
 });
+
+describe("Macros", async () => {
+  const jarvis = new Jarvis();
+  jarvis.addCommand({
+    command: "greet <name>",
+    aliases: ["hello <name>"],
+    handler: ({ args }) => {
+      return `Hello ${args.name},how are you?`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "reply <name>",
+    handler: ({ args }) => {
+      return `Hello ${args.name},i'm fine thank you!`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "end <name>",
+    handler: ({ args }) => {
+      return `Good it was nice meeting you ${args.name}`;
+    }
+  });
+
+  jarvis.addMacro({
+    macro: "introduction",
+    commandList: ["greet lashan","reply dinuka","end lashan"]
+  });
+
+  test("should run the given commands given in the macro ", async () => {
+    expect(await jarvis.runMacro("introduction")).toEqual([
+      "Hello lashan,how are you?",
+      "Hello dinuka,i'm fine thank you!",
+      "Good it was nice meeting you lashan"
+    ]);
+  });
+});

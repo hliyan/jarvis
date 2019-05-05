@@ -7,6 +7,7 @@ const {
 class Jarvis {
   constructor() {
     this.commands = []; // list of registered commands
+    this.macros = []; //list of macros
     this.activeCommand = null; // currently active command
     this.state = {}; // state variables for currently active command
   }
@@ -30,6 +31,34 @@ class Jarvis {
       tokens: parseCommand(command),
       patterns
     });
+  }
+
+    /**
+   * Registers a new macro with Jarvis
+   * USAGE: jarvis.addMacro({ macro: 'login',
+   *          commandList:['launch chrome','open google.lk'] });
+   */
+  addMacro({ macro, commandList }) {
+    this.macros.push({
+      macro: macro,
+      commandList: commandList
+    });
+  }
+
+
+   /**
+   * Run a  predefined macro
+   * USAGE: jarvis.runMacro('login')
+   */
+  async runMacro(macro) {
+    const commandList = this._findMacro(macro);
+    let results = [];
+    if (commandList) {
+      for (let i = 0; i < commandList.length; i++) {
+        results.push(await this.send(commandList[i]));
+      }
+      return results;
+    }
   }
 
   /**
@@ -63,6 +92,13 @@ class Jarvis {
       const command = this.commands[i];
       if (parseInputTokens(command, inputTokens))
         return command;
+    }
+    return null;
+  }
+
+  _findMacro(macro) {
+    for (let i = 0; i < this.macros.length; i++) {
+      if (macro === this.macros[i].macro) return this.macros[i].commandList;
     }
     return null;
   }
