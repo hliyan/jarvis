@@ -1,5 +1,5 @@
 const Jarvis = require("../index");
-
+jest.setTimeout(30000);
 describe("basic command", async () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
@@ -145,7 +145,7 @@ describe("Macros", async () => {
 
   jarvis.addMacro({
     macro: "introduction",
-    commandList: ["greet lashan", "reply dinuka", "end lashan"]
+    commandList: ["greet lashan","reply dinuka","end lashan"]
   });
 
   test("should run the given commands given in the macro ", async () => {
