@@ -13,10 +13,10 @@ exports.tokenize = tokenize;
 // [{value: 'hello', isArg: false}, {value: name, isArg: true}]
 const parseCommand = (commandStr) => {
   const tokens = [];
-  commandStr.split(' ').forEach((token) => {
+  commandStr.split(" ").forEach(token => {
     tokens.push({
-      value: token.replace(/<|>/g, ''),
-      isArg: token.includes('<')
+      value: token.replace(/\$/g, ""),
+      isArg: token.includes("$")
     });
   });
   return tokens;
