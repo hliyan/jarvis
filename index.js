@@ -1,4 +1,9 @@
-const { parseCommand, tokenize, parseInputTokens } = require("./src/utils");
+const {
+  parseCommand,
+  tokenize,
+  parseInputTokens,
+  parseCommandInMacro
+} = require("./src/utils");
 
 class Jarvis {
   constructor() {
@@ -32,43 +37,21 @@ class Jarvis {
     });
   }
 
-    /**
-   * Registers a new macro with Jarvis
-   * USAGE: jarvis.addMacro({ macro: 'login',
-   *          commandList:['launch chrome','open google.lk'] });
-   */
-  addMacro({ macro, commandList }) {
-    this.macros.push({
-      macro: macro,
-      commandList: commandList
-    });
-  }
-
-
-   /**
-   * Run a  predefined macro
-   * USAGE: jarvis.runMacro('login')
-   */
-  async runMacro(macro) {
-    const commandList = this._findMacro(macro);
-    let results = [];
-    if (commandList) {
-      for (let i = 0; i < commandList.length; i++) {
-        results.push(await this.send(commandList[i]));
-      }
-      return results;
-    }
-  }
-
   /**
    * Registers a new macro with Jarvis
    * USAGE: jarvis.addMacro({ macro: 'login',
    *          commandList:['launch chrome','open google.lk'] });
    */
   addMacro({ macro, commandList }) {
+    const patterns = [];
+    const args = {};
+    patterns.push({ tokens: parseCommand(macro) });
     this.macros.push({
       macro: macro,
-      commandList: commandList
+      commandList: commandList,
+      tokens: parseCommand(macro),
+      patterns,
+      args
     });
   }
 
@@ -77,11 +60,12 @@ class Jarvis {
    * USAGE: jarvis.runMacro('login')
    */
   async runMacro(macro) {
-    const commandList = this._findMacro(macro);
+    const { commandList, args } = this._findMacro(macro);
     let results = [];
     if (commandList) {
       for (let i = 0; i < commandList.length; i++) {
-        results.push(await this.send(commandList[i]));
+        const command = parseCommandInMacro(commandList[i], args);
+        results.push(await this.send(command));
       }
       return results;
     }
@@ -131,15 +115,15 @@ class Jarvis {
   }
 
   _findMacro(macro) {
-    for (let i = 0; i < this.macros.length; i++) {
-      if (macro === this.macros[i].macro) return this.macros[i].commandList;
-    }
-    return null;
-  }
+    const inputTokens = tokenize(macro);
 
-  _findMacro(macro) {
     for (let i = 0; i < this.macros.length; i++) {
-      if (macro === this.macros[i].macro) return this.macros[i].commandList;
+      const macro = this.macros[i];
+      const args = parseInputTokens(macro, inputTokens);
+      if (args) {
+        this.macros[i].args = args.args;
+        return this.macros[i];
+      }
     }
     return null;
   }
@@ -173,7 +157,6 @@ class Jarvis {
 
     if (line.startsWith("how to")) {
       //identify the start of a macro
-
       this.macroName = line.substr(6).trim();
       this.isMacroActive = true;
       return "you are now entering a macro. type the statements, one line at a time. when done, type 'end'";

@@ -84,7 +84,7 @@ describe("command with args", () => {
 
   test("should match with variables", async () => {
     jarvis.addCommand({
-      command: "say hello to <name> now",
+      command: "say hello to $name now",
       handler: ({ tokens, args }) => {
         expect(tokens).toEqual(["say", "hello", "to", "John Doe", "now"]);
         expect(args).toEqual({ name: "John Doe" });
@@ -101,8 +101,8 @@ describe("command with args", () => {
 describe("aliases", () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
-    command: "greet <name>",
-    aliases: ["hello <name> how are you"],
+    command: "greet $name",
+    aliases: ["hello $name how are you"],
     handler: ({ args }) => {
       return `Hello ${args.name}`;
     }
@@ -122,22 +122,22 @@ describe("aliases", () => {
 describe("Macros functions", async () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
-    command: "greet <name>",
-    aliases: ["hello <name>"],
+    command: "greet $name",
+    aliases: ["hello $name"],
     handler: ({ args }) => {
       return `Hello ${args.name},how are you?`;
     }
   });
 
   jarvis.addCommand({
-    command: "reply <name>",
+    command: "reply $name",
     handler: ({ args }) => {
       return `Hello ${args.name},i'm fine thank you!`;
     }
   });
 
   jarvis.addCommand({
-    command: "end <name>",
+    command: "end $name",
     handler: ({ args }) => {
       return `Good it was nice meeting you ${args.name}`;
     }
@@ -160,28 +160,28 @@ describe("Macros functions", async () => {
 describe("Macros using CLI", async () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
-    command: "greet <name>",
-    aliases: ["hello <name>"],
+    command: "greet $name",
+    aliases: ["hello $name"],
     handler: ({ args }) => {
       return `Hello ${args.name},how are you?`;
     }
   });
 
   jarvis.addCommand({
-    command: "reply <name>",
+    command: "reply $name",
     handler: ({ args }) => {
       return `Hello ${args.name},i'm fine thank you!`;
     }
   });
 
   jarvis.addCommand({
-    command: "end <name>",
+    command: "end $name",
     handler: ({ args }) => {
       return `Good it was nice meeting you ${args.name}`;
     }
   });
 
-  const macro = "test";
+  const macro = "test $user";
   test("should run the given commands given in the macro ", async () => {
     expect(await jarvis.send("how to " + macro)).toEqual(
       "you are now entering a macro. type the" +
@@ -192,14 +192,14 @@ describe("Macros using CLI", async () => {
     expect(await jarvis.send("fake command")).toEqual(
       "Please enter a proper command"
     );
-    await jarvis.send("reply dinuka");
+    await jarvis.send("reply $user");
     expect(await jarvis.send("end")).toEqual(
       "macro '" + macro + "' has been added"
     );
 
-    expect(await jarvis.send(macro)).toEqual([
+    expect(await jarvis.send("test naruto ")).toEqual([
       "Hello lashan,how are you?",
-      "Hello dinuka,i'm fine thank you!"
+      "Hello naruto,i'm fine thank you!"
     ]);
   });
 });
