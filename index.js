@@ -6,6 +6,9 @@ class Jarvis {
     this.macros = []; //list of macros
     this.activeCommand = null; // currently active command
     this.state = {}; // state variables for currently active command
+    this.isMacroActive = false; //currently active macro
+    this.activeMacro = []; //temperary variable to collect macro commands
+    this.macroName = ""; //temperary variable to keep macro name
   }
 
   /**
@@ -74,6 +77,15 @@ class Jarvis {
   }
 
   /**
+   * end of an macro
+   */
+  endMacro() {
+    this.isMacroActive = false;
+    this.activeMacro = [];
+    this.macroName = "";
+  }
+
+  /**
    * To be called only by command handlers for an interactive shell command
    * Can be used to set variables for the duration of that shell command
    */
@@ -123,8 +135,36 @@ class Jarvis {
       }
       return this._runCommand(null, line);
     }
-    const command = this._findCommand(line);
-    return command ? this._runCommand(command, line) : null;
+
+    if (line.startsWith("how to")) {
+      //identify the start of a macro
+
+      this.macroName = line.substr(6).trim();
+      this.isMacroActive = true;
+      return "you are now entering a macro. type the statements, one line at a time. when done, type 'end'";
+    }
+
+    if (!this.isMacroActive && this._findMacro(line)) {
+      //run macro if we are not currently adding a macro
+      return await this.runMacro(line);
+    } else if (this.isMacroActive && line === "end") {
+      //end of macro
+      this.addMacro({ macro: this.macroName, commandList: this.activeMacro });
+      const macroName = this.macroName;
+      this.endMacro();
+      return "macro '" + macroName + "' has been added";
+    } else if (this.isMacroActive && line) {
+      //add commands to macro
+      const command = this._findCommand(line);
+      if (command) {
+        this.activeMacro.push(line);
+      } else {
+        return "Please enter a proper command";
+      }
+    } else {
+      const command = this._findCommand(line);
+      return command ? this._runCommand(command, line) : null;
+    }
   }
 }
 
