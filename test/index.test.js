@@ -1,5 +1,5 @@
 const Jarvis = require("../index");
-jest.setTimeout(30000);
+
 describe("basic command", async () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
@@ -119,7 +119,7 @@ describe("aliases", () => {
   });
 });
 
-describe("Macros", async () => {
+describe("Macros functions", async () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
     command: "greet <name>",
@@ -145,7 +145,7 @@ describe("Macros", async () => {
 
   jarvis.addMacro({
     macro: "introduction",
-    commandList: ["greet lashan","reply dinuka","end lashan"]
+    commandList: ["greet lashan", "reply dinuka", "end lashan"]
   });
 
   test("should run the given commands given in the macro ", async () => {
@@ -153,6 +153,53 @@ describe("Macros", async () => {
       "Hello lashan,how are you?",
       "Hello dinuka,i'm fine thank you!",
       "Good it was nice meeting you lashan"
+    ]);
+  });
+});
+
+describe("Macros using CLI", async () => {
+  const jarvis = new Jarvis();
+  jarvis.addCommand({
+    command: "greet <name>",
+    aliases: ["hello <name>"],
+    handler: ({ args }) => {
+      return `Hello ${args.name},how are you?`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "reply <name>",
+    handler: ({ args }) => {
+      return `Hello ${args.name},i'm fine thank you!`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "end <name>",
+    handler: ({ args }) => {
+      return `Good it was nice meeting you ${args.name}`;
+    }
+  });
+
+  const macro = "test";
+  test("should run the given commands given in the macro ", async () => {
+    expect(await jarvis.send("how to " + macro)).toEqual(
+      "you are now entering a macro. type the" +
+        " statements, one line at a time. when done, type 'end'"
+    );
+
+    await jarvis.send("greet lashan");
+    expect(await jarvis.send("fake command")).toEqual(
+      "Please enter a proper command"
+    );
+    await jarvis.send("reply dinuka");
+    expect(await jarvis.send("end")).toEqual(
+      "macro '" + macro + "' has been added"
+    );
+
+    expect(await jarvis.send(macro)).toEqual([
+      "Hello lashan,how are you?",
+      "Hello dinuka,i'm fine thank you!"
     ]);
   });
 });
