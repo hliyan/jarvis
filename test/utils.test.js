@@ -27,14 +27,14 @@ describe('tokenize', () => {
 describe('parseCommand', () => {
   
   test('basic command', () => {
-    expect(parseCommand('hello <name>'))
+    expect(parseCommand('hello $name'))
       .toEqual([
         {value: 'hello', isArg: false}, {value: 'name', isArg: true}
       ]);
   }); 
 
   test('basic command with infix', () => {
-    expect(parseCommand('hello <name> how are you'))
+    expect(parseCommand('hello $name how are you'))
       .toEqual([
         {value: 'hello', isArg: false}, 
         {value: 'name', isArg: true},
