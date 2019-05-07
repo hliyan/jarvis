@@ -202,7 +202,7 @@ You can use this to re-use blocks of commands within a script.
 in this context
   PI is 3.14
 
-how to get area of circle with radius $radius>
+how to get area of circle with radius $radius
   # more statements here
 end
 ```
