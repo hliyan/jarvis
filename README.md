@@ -10,7 +10,7 @@ JARVIS helps you write rudimentary English wrappers around libraries or APIs, li
 ```javascript
 // wrap you JavaScript function with an English API:
 jarvis.addCommand({
-  command: '<number> to the power of <power>',
+  command: '$number to the power of $power',
   handler: ({args: {number, power}}) => {
     const result = Math.pow(parseInt(number), parseInt(power));
     return `${number} to the power of ${power} is ${result}!`;
@@ -45,11 +45,11 @@ const client = new IssueClient();
 
 // register command
 app.addCommand({
-  command: 'connectToRepository <repoName>',
+  command: 'connectToRepository $repoName',
   aliases: [
-    'connect to <repoName>',
-    'connect repo <repoName>',
-    'connect to <repoName> repo'
+    'connect to $repoName',
+    'connect repo $repoName',
+    'connect to $repoName repo'
   ],
   handler: async ({args: {repoName}}) => {
     const res = await client.connect(repoName);
@@ -76,10 +76,10 @@ const client = new FAQClient();
 
 // register the command
 app.addCommand({
-  command: 'getCountryPresident <country>',
+  command: 'getCountryPresident $country',
   aliases: [
-    'who is the president of <country>',
-    '<country> president'
+    'who is the president of $country',
+    '$country president'
   ],
   handler: async ({args: {country}}) => {
     const president = await client.getPresident(country);
@@ -127,7 +127,7 @@ jarvis>
 
 Use this when the workflow you're trying to wrap is too complicated to execute as a single line command.
 
-You can enter an interactive command session using `jarvis.startCommand(<name>)` and exit that particular session using `jarvis.endCommand()`. State that needs to be maintained for the duration of the interactive session can be set using `jarvis.setCommandState(<object>)`.
+You can enter an interactive command session using `jarvis.startCommand($name)` and exit that particular session using `jarvis.endCommand()`. State that needs to be maintained for the duration of the interactive session can be set using `jarvis.setCommandState($object)`.
 
 ```javascript
   const jarvis = new Jarvis();
@@ -202,7 +202,7 @@ You can use this to re-use blocks of commands within a script.
 in this context
   PI is 3.14
 
-how to get area of circle with radius <radius>
+how to get area of circle with radius $radius
   # more statements here
 end
 ```
