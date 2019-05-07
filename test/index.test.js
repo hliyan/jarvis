@@ -58,9 +58,17 @@ describe("static phrase command", () => {
     }
   });
 
+  jarvis.addCommand({
+    command: "how are you doing",
+    handler: ({ line, args }) => {
+      return "I'm doing well";
+    }
+  });
+
   test("should match the phrase exactly", async () => {
     expect(await jarvis.send("how are you")).toEqual("I'm fine");
     expect(await jarvis.send("how are")).toEqual(null);
+    expect(await jarvis.send("how are you doing")).toEqual("I'm doing well");
   });
 });
 
