@@ -9,7 +9,7 @@ const tokenize = (line) => {
 };
 exports.tokenize = tokenize;
 
-// converts 'hello <name>' to 
+// converts 'hello $name' to 
 // [{value: 'hello', isArg: false}, {value: name, isArg: true}]
 const parseCommand = (commandStr) => {
   const tokens = [];

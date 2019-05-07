@@ -1,5 +1,27 @@
 const Jarvis = require("../index");
 
+describe('test macros', async () => {
+  const jarvis = new Jarvis();
+
+  jarvis.addCommand({command: 'command 1',handler: ({context, line}) => {return 'tested: ' + line;}});
+  jarvis.addCommand({command: 'command 2',handler: ({context, line}) => {return 'tested: ' + line;}});
+  jarvis.addCommand({command: 'command 3',handler: ({context, line}) => {return 'tested: ' + line;}});
+
+  jarvis.send('how to introduce login')
+  jarvis.send('command 1')
+  jarvis.send('command 2')
+  jarvis.send('command 3')
+  jarvis.send('end')
+
+  test('should return the expected output', async () => {
+    expect(await jarvis.send('execute login')).toEqual(['tested: command 1','tested: command 2','tested: command 3']);
+  });
+
+  test('should return the expected output', async () => {
+    expect(await jarvis.send('execute search')).toBe(null);  
+  });
+});
+
 describe("basic command", async () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({

@@ -1,7 +1,7 @@
 const { 
   parseCommand, 
   tokenize, 
-  parseInputTokens 
+  parseInputTokens
 } = require("./src/utils");
 
 class Jarvis {
@@ -9,7 +9,61 @@ class Jarvis {
     this.commands = []; // list of registered commands
     this.activeCommand = null; // currently active command
     this.state = {}; // state variables for currently active command
+
+    this.activeMacro = false;
+    this.macros = []; // list of registered macros
+    this.macroName = null;
+    this.statements = []
   }
+
+  _activeMacros(command){
+    console.log("You are now entering a macro. Type the statements, one line at a time.")
+    this.activeMacro = true
+
+    let str = "how to intoduce ";
+    this.macroName = command.substr(str.length+1)
+    this.statements = []
+  }
+
+  _recordMacro(command){
+    if(command === 'end'){
+      this.activeMacro = false;
+      this.macros.push({
+        macroName: this.macroName,
+        sequence: this.statements
+      })
+      console.log('macro "',this.macroName,'" has been added.')
+      return
+    }
+    return this.statements.push(command)
+  }
+
+  _findMacro(macroName){
+    for (let i = 0; i < this.macros.length; i++) {
+      if(this.macros[i].macroName === macroName){
+        const sequence = this.macros[i].sequence;
+        return sequence;
+      }
+    }
+    return null;
+  }
+
+
+  async _runMacro(command){
+    let str = "execute"
+    const sequence = this._findMacro(command.substr(str.length+1))
+  
+    if(sequence) {
+      let res = []
+      for (let i = 0; i < sequence.length; i++){
+        const result = await this.send(sequence[i])
+        res.push(result)
+      }
+      return res;
+    }
+    return null;
+  }
+
 
   /**
    * Registers a new command with Jarvis
@@ -72,7 +126,6 @@ class Jarvis {
   async _runCommand(command, line) {
     const inputTokens = tokenize(line);
     const handler = command ? command.handler : this.activeCommand.handler;
-
     return await handler({
       context: this,
       line,
@@ -94,9 +147,22 @@ class Jarvis {
       return this._runCommand(null, line);
     }
 
-    const command = this._findCommand(line);
-    return command ? this._runCommand(command, line) : null;
+    if(line.startsWith("how to introduce")){
+      return this._activeMacros(line)
+    }
+
+    if(this.activeMacro){
+      return this._recordMacro(line)
+    }
+    else if(line.startsWith('execute')){
+      return this._runMacro(line)
+    }
+    else{
+      const command = this._findCommand(line);
+      return command ? this._runCommand(command, line) : null;
+    }
   }
+
 }
 
 module.exports = Jarvis;
