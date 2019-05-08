@@ -1,7 +1,8 @@
-const { 
-  parseCommand, 
-  tokenize, 
-  parseInputTokens 
+const {
+  parseCommand,
+  tokenize,
+  parseInputTokens,
+  parseMacro
 } = require("../src/utils");
 
 describe('tokenize', () => {
@@ -43,4 +44,12 @@ describe('parseCommand', () => {
         {value: 'you', isArg: false}
       ]);
   }); 
+});
+
+describe("parseMacro", () => {
+  test("basic macro", () => {
+    expect(
+      parseMacro(`how to login\nhello $name\nhow are you\nim jarvis\nend`)
+    ).toEqual(["hello $name", "how are you", "im jarvis"]);
+  });
 });

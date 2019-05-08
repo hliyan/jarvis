@@ -49,3 +49,16 @@ const parseInputTokens = (command, inputTokens) => {
 };
 
 exports.parseInputTokens = parseInputTokens;
+
+//pass a macro to produce set of commands
+const parseMacro = macroStr => {
+  const commands = [];
+  macroStr.split("\n").forEach(command => {
+    if (command !== "end" && !command.includes("how to")) {
+      commands.push(command.trim());
+    }
+  });
+  return commands;
+};
+
+exports.parseMacro = parseMacro;

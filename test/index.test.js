@@ -119,4 +119,69 @@ describe("aliases", () => {
   });
 });
 
+describe("macro handler", () => {
+  const jarvis = new Jarvis();
 
+  jarvis.addCommand({
+    command: "launch browser $browser",
+    handler: ({ args: { browser } }) => {
+      return "launched browser " + browser;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "open url",
+    handler: () => {
+      return "opened url";
+    }
+  });
+
+  jarvis.addCommand({
+    command: "click login",
+    handler: () => {
+      return "clicked login";
+    }
+  });
+
+  test("should execute a simple command", async () => {
+    const res = await jarvis.send("launch browser chrome");
+    expect(res).toEqual("launched browser chrome");
+  });
+
+  test("should create and store a macro", async () => {
+    await jarvis.send("how to login $browser");
+    await jarvis.send("launch browser $browser");
+    await jarvis.send("open url");
+    await jarvis.send("click login");
+    const res = await jarvis.send("end");
+    expect(res).toEqual("login $browser");
+  });
+
+  test("should execute a stored macro while assigning variables", async () => {
+    await jarvis.send("how to login $browser");
+    await jarvis.send("launch browser $browser");
+    await jarvis.send("open url");
+    await jarvis.send("click login");
+    await jarvis.send("end");
+    const res = await jarvis.send("login chrome");
+    expect(res).toEqual([
+      "launched browser chrome",
+      "opened url",
+      "clicked login"
+    ]);
+  });
+
+  test("should identify an invalid command", async () => {
+    await jarvis.send("how to some macro");
+    await jarvis.send("invalid command");
+    await jarvis.send("end");
+    const res = await jarvis.send("some macro");
+    expect(res).toEqual([null]);
+  });
+
+  test("should identify a macro without end", async () => {
+    await jarvis.send("how to login $browser");
+    const res = await jarvis.send("launch browser $browser");
+    expect(res).toEqual(undefined);
+  });
+});
