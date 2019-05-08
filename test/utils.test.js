@@ -1,7 +1,8 @@
 const { 
   parseCommand, 
   tokenize, 
-  parseInputTokens 
+  parseInputTokens,
+  parseCommandInMacro 
 } = require("../src/utils");
 
 describe('tokenize', () => {
@@ -42,5 +43,18 @@ describe('parseCommand', () => {
         {value: 'are', isArg: false}, 
         {value: 'you', isArg: false}
       ]);
+  }); 
+});
+
+describe('parseCommandInMacro', () => {
+  
+  test('basic command', () => {
+    expect(parseCommandInMacro('hello $name',{name: 'jhon doe'}))
+      .toEqual('hello jhon doe');
+  }); 
+
+  test('basic command with two variables', () => {
+    expect(parseCommandInMacro('hello $name , are you from $home ?',{name:'jhon snow',home:'winterfell'}))
+      .toEqual('hello jhon snow , are you from winterfell ?');
   }); 
 });

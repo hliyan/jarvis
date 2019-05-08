@@ -119,4 +119,165 @@ describe("aliases", () => {
   });
 });
 
+describe("Macros functions", async () => {
+  const jarvis = new Jarvis();
+  jarvis.addCommand({
+    command: "greet $name",
+    aliases: ["hello $name"],
+    handler: ({ args }) => {
+      return `Hello ${args.name},how are you?`;
+    }
+  });
 
+  jarvis.addCommand({
+    command: "reply $name",
+    handler: ({ args }) => {
+      return `Hello ${args.name},i'm fine thank you!`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "end $name",
+    handler: ({ args }) => {
+      return `Good it was nice meeting you ${args.name}`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "test void return",
+    handler: () => {
+      //do something without returning a value
+    }
+  });
+
+  jarvis.addMacro({
+    macro: "insideMacro",
+    commandList: ["reply dinuka"]
+  });
+
+  jarvis.addMacro({
+    macro: "macroWithoutCommands",
+    commandList: []
+  });
+
+  jarvis.addMacro({
+    macro: "testMacro",
+    commandList: ["greet lashan", "reply dinuka", "end lashan"]
+  });
+
+  jarvis.addMacro({
+    macro: "testMacroWithAMacro",
+    commandList: ["greet lashan", "insideMacro", "end lashan"]
+  });
+
+  jarvis.addMacro({
+    macro: "testMacroWithAnEmptyMacro",
+    commandList: ["greet lashan", "macroWithoutCommands", "end lashan"]
+  });
+
+  jarvis.addMacro({
+    macro: "macroVoidReturn",
+    commandList: ["greet lashan", "test void return", "end lashan"]
+  });
+
+  test("should run the given commands sequentially in the given macro ", async () => {
+    expect(await jarvis.runMacro("testMacro")).toEqual([
+      "Hello lashan,how are you?",
+      "Hello dinuka,i'm fine thank you!",
+      "Good it was nice meeting you lashan"
+    ]);
+  });
+
+  test("should run the given commands sequentially even with a macro inside the given macro ", async () => {
+    expect(await jarvis.runMacro("testMacroWithAMacro")).toEqual([
+      "Hello lashan,how are you?",
+      "Hello dinuka,i'm fine thank you!",
+      "Good it was nice meeting you lashan"
+    ]);
+  });
+
+  test("should run the given commands sequentially in the given macro ", async () => {
+    expect(await jarvis.runMacro("testMacroWithAnEmptyMacro")).toEqual([
+      "Hello lashan,how are you?",
+      "Good it was nice meeting you lashan"
+    ]);
+  });
+
+  test("should return null if the macro is not defined ", async () => {
+    expect(await jarvis.runMacro("undefinedMacro")).toEqual(null);
+  });
+
+  test("should return null if there is a commandless macro", async () => {
+    expect(await jarvis.runMacro("macroWithoutCommands")).toEqual(null);
+  });
+
+  test("should ignore void returns", async () => {
+    expect(await jarvis.runMacro("macroVoidReturn")).toEqual([
+      "Hello lashan,how are you?",
+      "Good it was nice meeting you lashan"
+    ]);
+  });
+});
+
+describe("Macros using CLI", async () => {
+  const jarvis = new Jarvis();
+  jarvis.addCommand({
+    command: "greet $name",
+    aliases: ["hello $name"],
+    handler: ({ args }) => {
+      return `Hello ${args.name},how are you?`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "reply $name",
+    handler: ({ args }) => {
+      return `Hello ${args.name},i'm fine thank you!`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "end $name",
+    handler: ({ args }) => {
+      return `Good it was nice meeting you ${args.name}`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "from inside",
+    handler: () => {
+      return `hi from inside a macro`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "commandOrMacro",
+    handler: () => {
+      return `hi from the command`;
+    }
+  });
+
+  const macro1 = "test $user1 $user2";
+
+  test("should run the given commands given in the macro ", async () => {
+    expect(await jarvis.send("how to " + macro1)).toEqual(
+      "you are now entering a macro. type the" +
+        " statements, one line at a time. when done, type 'end'"
+    );
+
+    await jarvis.send("greet $user2");
+    expect(await jarvis.send("fake command")).toEqual(
+      "Please enter a proper command or macro"
+    );
+
+    await jarvis.send("reply $user1");
+    expect(await jarvis.send("end")).toEqual(
+      "macro '" + macro1 + "' has been added"
+    );
+
+    expect(await jarvis.send("test naruto sauske")).toEqual([
+      "Hello sauske,how are you?",
+      "Hello naruto,i'm fine thank you!"
+    ]);
+  });
+});
