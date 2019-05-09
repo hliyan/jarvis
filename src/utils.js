@@ -9,7 +9,7 @@ const tokenize = (line) => {
 };
 exports.tokenize = tokenize;
 
-// converts 'hello <name>' to 
+// converts 'hello $name' to 
 // [{value: 'hello', isArg: false}, {value: name, isArg: true}]
 const parseCommand = (commandStr) => {
   const tokens = [];
@@ -51,3 +51,46 @@ const parseInputTokens = (command, inputTokens) => {
 };
 
 exports.parseInputTokens = parseInputTokens;
+
+// checks tokens against the macro command
+// returns args if match, else null
+const parseMacroInputTokens = (macro, inputTokens) => {
+  const patternTokens = macro.tokens;
+  if (patternTokens.length === inputTokens.length) {
+    const args = {};
+    let match = true;
+    for (let j = 0; j < patternTokens.length; j++) { // for each token in pattern
+      const patternToken = patternTokens[j];
+      if (patternToken.isArg) {
+        args[patternToken.value] = inputTokens[j];
+      }
+      else {
+        if (inputTokens[j] !== patternToken.value) {
+          match = false;
+          break;
+        }
+      }
+    }
+    if (match)
+      return { args };
+  }
+  return null;
+};
+exports.parseMacroInputTokens = parseMacroInputTokens;
+
+// change variable tokens to values of args
+// returns same string if no variables found
+const parseMacroSubCommand = (line, args) => {
+  let tokens = parseCommand(line);
+  let parsedLine = line;
+  tokens.forEach((token) => {
+    if (token.isArg) {
+      if (args[token.value]) {
+        parsedLine = parsedLine.replace(`$${token.value}`, `"${args[token.value]}"`);
+      }
+    }
+  })
+
+  return parsedLine;
+};
+exports.parseMacroSubCommand = parseMacroSubCommand;

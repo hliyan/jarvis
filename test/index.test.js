@@ -16,6 +16,14 @@ describe("basic command", async () => {
   test("should return null for unknown command", async () => {
     expect(await jarvis.send("foo")).toBe(null);
   });
+
+  test("should return null for undefined command", async () => {
+    expect(await jarvis.send()).toBe(null);
+  });
+
+  test("should return null for empty string", async () => {
+    expect(await jarvis.send("")).toBe(null);
+  });
 });
 
 describe("interactive command", async () => {
@@ -127,4 +135,94 @@ describe("aliases", () => {
   });
 });
 
+describe('macros', () => {
+  const jarvis = new Jarvis();
 
+  jarvis.addCommand({
+    command: 'run hello',
+    handler: ({ args }) => {
+      return `Hello`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: 'run world',
+    handler: ({ args }) => {
+      return `world`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: 'load $language',
+    handler: ({ args }) => {
+      return `Running, ${args.language}`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: 'say $string',
+    handler: ({ args }) => {
+      return `${args.string}`;
+    }
+  });
+
+  test('initialize a macro', async () => {
+    expect(await jarvis.send('how to programme'))
+      .toEqual('You are now entering a macro. Type the statements, one line at a time. When done, type \'end\'.');
+  });
+
+  test('add macro with no variables', async () => {
+    await jarvis.send('how to write');
+    await jarvis.send('run hello');
+    await jarvis.send('run world');
+
+    expect(await jarvis.send('end'))
+      .toEqual('Macro "write" has been added.');
+  });
+
+  test('run a macro', async () => {
+    expect(await jarvis.send('write'))
+      .toEqual(['Hello', 'world']);
+  });
+
+  test('macro with multiple variables', async () => {
+    await jarvis.send('how to code $language $message');
+    await jarvis.send('load $language');
+    await jarvis.send('say $message')
+    await jarvis.send('end');
+
+    expect(await jarvis.send('code JavaScript "Hello World"'))
+      .toEqual(['Running, JavaScript', 'Hello World']);
+  });
+
+  test('not a valid command or macro', async () => {
+    await jarvis.send('how to existing macro');
+
+    expect(await jarvis.send('invalid command'))
+      .toEqual('Not a valid Command/Macro.');
+  });
+
+  test('providing a duplicate name', async () => {
+    await jarvis.send('how to test $language');
+    await jarvis.send('run hello');
+    await jarvis.send('end');
+
+    expect(await jarvis.send('how to test $language'))
+      .toEqual(`Macro name already exists!`);
+  });
+
+  test('macro with inner macro', async () => {
+    await jarvis.send('how to inner_macro $str1 $str2');
+    await jarvis.send('say $str1');
+    await jarvis.send('say $str2');
+    await jarvis.send('end');
+
+    await jarvis.send('how to outer_macro $string1 $string2 $string3');
+    await jarvis.send('say $string1');
+    await jarvis.send('inner_macro $string2 $string3');
+    await jarvis.send('end');
+
+    expect(await jarvis.send('outer_macro "Normal Command" "Inner Command 1" "Inner Command 2"'))
+      .toEqual(['Normal Command', ['Inner Command 1', 'Inner Command 2']]);
+  });
+});
