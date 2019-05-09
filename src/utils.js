@@ -28,22 +28,24 @@ exports.parseCommand = parseCommand;
 const parseInputTokens = (command, inputTokens) => {
   for (let i = 0; i < command.patterns.length; i++) { // for each pattern
     const patternTokens = command.patterns[i].tokens;
-    const args = {};
-    let match = true;
-    for (let j = 0; j < patternTokens.length; j++) { // for each token in pattern
-      const patternToken = patternTokens[j];
-      if (patternToken.isArg) {
-        args[patternToken.value] = inputTokens[j];
-      }
-      else {
-        if (inputTokens[j] !== patternToken.value) {
-          match = false;
-          break;
+    if (patternTokens.length === inputTokens.length) {
+      const args = {};
+      let match = true;
+      for (let j = 0; j < patternTokens.length; j++) { // for each token in pattern
+        const patternToken = patternTokens[j];
+        if (patternToken.isArg) {
+          args[patternToken.value] = inputTokens[j];
+        }
+        else {
+          if (inputTokens[j] !== patternToken.value) {
+            match = false;
+            break;
+          }
         }
       }
+      if (match)
+        return { args };
     }
-    if (match)
-      return { args };
   }
   return null;
 };
