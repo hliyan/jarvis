@@ -9,6 +9,19 @@ class Jarvis {
     this.commands = []; // list of registered commands
     this.activeCommand = null; // currently active command
     this.state = {}; // state variables for currently active command
+
+    this.commandHistory = [];
+  }
+
+  clearCommandHistory() { 
+    this.commandHistory = []; 
+  }
+  getCommandHistory() {
+    return this.commandHistory;
+  } 
+
+  updateCommandHistory(cmd){
+    this.commandHistory.push(cmd);
   }
 
   /**
@@ -85,6 +98,14 @@ class Jarvis {
    * Sends a command to the shell
    */
   async send(line) {
+
+    if(line === 'history'){
+      return this.getCommandHistory();
+    }
+    else{
+      this.updateCommandHistory(line);
+    }
+    
     if (this.activeCommand) {
       if (line === '..') {
         const out = 'Done with ' + this.activeCommand.command + '.';

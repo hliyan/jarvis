@@ -1,5 +1,32 @@
 const Jarvis = require("../index");
 
+describe("test command history", async () => {
+  const jarvis = new Jarvis();
+
+  jarvis.addCommand({command: "command 1", handler: ({ context, line }) => { return "tested: " + line; }});
+  jarvis.addCommand({command: "command 2", handler: ({ context, line }) => { return "tested: " + line; }});
+  jarvis.addCommand({command: "command 3", handler: ({ context, line }) => { return "tested: " + line; }});
+
+  jarvis.send("command 1")
+  jarvis.send("command 2")
+  jarvis.send("command 3")
+
+  test("should return the expected output", async () => {
+    expect(await jarvis.send("history")).toEqual(['command 1','command 2','command 3']);
+  });
+});
+
+describe("test no history", async () => {
+  const jarvis = new Jarvis();
+  jarvis.clearCommandHistory();
+
+  test("should return null array", async () => {
+    expect(await jarvis.send("history")).toEqual([]);
+  });
+
+});
+
+
 describe("basic command", async () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
