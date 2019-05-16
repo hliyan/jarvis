@@ -12,7 +12,9 @@ class Jarvis {
     this.macros = []; // list of registered macros
     this.activeCommand = null; // currently active command
     this.activeMacro = null; // currently active macro
+    this.activeConstants = null; // currently active constants
     this.state = {}; // state variables for currently active command
+    this.constants = {}; // registered constants
   }
 
   /**
@@ -61,12 +63,14 @@ class Jarvis {
     Object.assign(this.state, data);
   }
 
+
   _findCommand(line) {
     const inputTokens = tokenize(line);
     for (let i = 0; i < this.commands.length; i++) {
       const command = this.commands[i];
-      if (parseInputTokens(command, inputTokens))
+      if (parseInputTokens(command, inputTokens, this.constants)) {
         return command;
+      }
     }
     return null;
   }
@@ -83,7 +87,7 @@ class Jarvis {
       context: this,
       line,
       tokens: inputTokens,
-      args: command ? parseInputTokens(command, inputTokens).args : {}
+      args: command ? parseInputTokens(command, inputTokens, this.constants).args : {}
     });
   }
 
@@ -91,7 +95,7 @@ class Jarvis {
    * Sends a command to the shell
    */
   async send(line) {
-    if (!line || line === "") {
+    if (!line) {
       return null;
     }
     line = line.trim();
@@ -136,6 +140,36 @@ class Jarvis {
       }
     }
 
+    if (line.startsWith("in this context")) {
+      this.activeConstants = [];
+      const out = 'You are now entering constants. Type the constants, one line at a time. When done, type \'end\'.'
+      return out;
+    }
+
+    if (this.activeConstants) {
+      if (line === 'end') {
+        let keyList = '';
+        this.activeConstants.forEach(constant => {
+          let key = constant.key.toUpperCase();
+          let value = constant.value;
+
+          this.constants[key] = value;
+
+          keyList = keyList != '' ? keyList + ', ' + key : key;
+        })
+
+        const out = `Constants "${keyList}" have been added.`;
+        this.activeConstants = null;
+        return out;
+      }
+
+      let constant = {
+        key: line.split(/ is /i)[0].trim(),
+        value: line.split(/ is /i)[1].trim()
+      };
+      this.activeConstants.push(constant);
+    }
+
     return await this._execute(line);
   }
 
@@ -171,7 +205,7 @@ class Jarvis {
   async _runMacro(macro) {
     let subCommandsStatus = [];
     for (let line of macro.subCommands) {
-      line = parseMacroSubCommand(line, macro.args);
+      line = parseMacroSubCommand(line, macro.args, this.constants);
       subCommandsStatus.push(await this._execute(line));
     }
     return subCommandsStatus;
