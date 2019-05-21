@@ -102,8 +102,7 @@ describe('macros', () => {
   });
 
   test('macro sub command with missing variable in args', () => {
-    let constants = {};
-    expect(parseMacroSubCommand('run $code', {}, constants))
+    expect(parseMacroSubCommand('run $code', {}))
       .toEqual("run $code");
   });
 });

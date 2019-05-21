@@ -241,7 +241,8 @@ describe("constants", async () => {
     expect(await jarvis.send('in this context')).toEqual('You are now entering constants. Type the constants, one line at a time. When done, type \'end\'.');
     await jarvis.send('NAME is JARVIS');
     await jarvis.send('VERSION is 1');
-    expect(await jarvis.send('end')).toEqual('Constants "NAME, VERSION" have been added.');
+    expect(await jarvis.send('Author is John')).toEqual('A constant name should be in block letters.');
+    expect(await jarvis.send('end')).toEqual('Constants "NAME,VERSION" have been added.');
   });
 
   test("constant usage in command", async () => {

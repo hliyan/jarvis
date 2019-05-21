@@ -3,7 +3,8 @@ const {
   tokenize,
   parseInputTokens,
   parseMacroInputTokens,
-  parseMacroSubCommand
+  parseMacroSubCommand,
+  parseConstants
 } = require("./src/utils");
 
 class Jarvis {
@@ -68,7 +69,7 @@ class Jarvis {
     const inputTokens = tokenize(line);
     for (let i = 0; i < this.commands.length; i++) {
       const command = this.commands[i];
-      if (parseInputTokens(command, inputTokens, this.constants)) {
+      if (parseInputTokens(command, inputTokens)) {
         return command;
       }
     }
@@ -80,6 +81,7 @@ class Jarvis {
    * for the active command
    */
   async _runCommand(command, line) {
+    line = parseConstants(line, this.constants);
     const inputTokens = tokenize(line);
     const handler = command ? command.handler : this.activeCommand.handler;
 
@@ -87,7 +89,7 @@ class Jarvis {
       context: this,
       line,
       tokens: inputTokens,
-      args: command ? parseInputTokens(command, inputTokens, this.constants).args : {}
+      args: command ? parseInputTokens(command, inputTokens).args : {}
     });
   }
 
@@ -148,14 +150,10 @@ class Jarvis {
 
     if (this.activeConstants) {
       if (line === 'end') {
-        let keyList = '';
+        let keyList = [];
         this.activeConstants.forEach(constant => {
-          let key = constant.key.toUpperCase();
-          let value = constant.value;
-
-          this.constants[key] = value;
-
-          keyList = keyList != '' ? keyList + ', ' + key : key;
+          this.constants[constant.key] = constant.value;
+          keyList.push(constant.key);
         })
 
         const out = `Constants "${keyList}" have been added.`;
@@ -163,11 +161,16 @@ class Jarvis {
         return out;
       }
 
-      let constant = {
-        key: line.split(/ is /i)[0].trim(),
-        value: line.split(/ is /i)[1].trim()
-      };
-      this.activeConstants.push(constant);
+      let key = line.split(/ is /i)[0].trim();
+      let value = line.split(/ is /i)[1].trim();
+
+      if (key === key.toUpperCase()) {
+        let constant = { key, value };
+        this.activeConstants.push(constant);
+        return;
+      } else {
+        return 'A constant name should be in block letters.'
+      }
     }
 
     return await this._execute(line);
@@ -205,7 +208,8 @@ class Jarvis {
   async _runMacro(macro) {
     let subCommandsStatus = [];
     for (let line of macro.subCommands) {
-      line = parseMacroSubCommand(line, macro.args, this.constants);
+      line = parseConstants(line, this.constants);
+      line = parseMacroSubCommand(line, macro.args);
       subCommandsStatus.push(await this._execute(line));
     }
     return subCommandsStatus;
@@ -215,6 +219,7 @@ class Jarvis {
    * Find the macro by sending macro name
    */
   _findMacro(line) {
+    line = parseConstants(line, this.constants);
     const inputTokens = tokenize(line);
     for (let i = 0; i < this.macros.length; i++) {
       const macro = this.macros[i];
