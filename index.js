@@ -4,7 +4,9 @@ const {
   parseInputTokens,
   parseMacroInputTokens,
   parseMacroSubCommand,
-  parseConstants
+  parseConstants,
+  parseScript,
+  validateScript
 } = require("./src/utils");
 
 class Jarvis {
@@ -16,6 +18,18 @@ class Jarvis {
     this.activeConstants = null; // currently active constants
     this.state = {}; // state variables for currently active command
     this.constants = {}; // registered constants
+  }
+
+  /**
+   * Checks for available scripts to switch mode to script mode if a
+   * script with specified extension is provided
+   * USAGE: jarvis.addScriptMode('jarvis', 'script.jarvis');
+   */
+  async addScriptMode(extension, script) {
+    if (script && validateScript(extension, script)) {
+      return await this._runScript(script);
+    }
+    return null;
   }
 
   /**
@@ -111,7 +125,7 @@ class Jarvis {
       return this._runCommand(null, line);
     }
 
-    if (line.startsWith("how to")) {
+    if (line.startsWith("how to ")) {
       let macroCommand = line.replace('how to', '').trim();
       if (this._findMacro(macroCommand)) {
         return `Macro name already exists!`
@@ -228,6 +242,18 @@ class Jarvis {
         return Object.assign({}, macro, args)
     }
     return null;
+  }
+
+  /**
+   * Execute a provided script
+   */
+  async _runScript(script) {
+    let res = [];
+    const commands = parseScript(script);
+    for (const command of commands) {
+      res.push(await this.send(command));
+    }
+    return res;
   }
 }
 

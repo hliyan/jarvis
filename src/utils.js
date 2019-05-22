@@ -1,6 +1,8 @@
 // jarvis, just another rudimentary verbal interface shell
 // converts 'hello "John Doe"' to ['hello', 'John, Doe']
-const tokenize = (line) => {
+const fs = require("fs");
+const path = require("path");
+const tokenize = line => {
   const tokens = line.match(/"([^"]+)"|\S+/g);
   for (let i = 0; i < tokens.length; i++) {
     tokens[i] = tokens[i].replace(/"/g, '');
@@ -109,3 +111,22 @@ const parseConstants = (line, constants) => {
   return parsedLine;
 }
 exports.parseConstants = parseConstants;
+
+// returns string content by reading a script
+const parseScript = filename => {
+  const content = fs.readFileSync(filename, "utf8");
+  const lines = content.split("\n");
+  const filteredCommands = lines.filter(line => {
+    return line !== "";
+  });
+  return filteredCommands;
+};
+exports.parseScript = parseScript;
+
+// checks the validity of a provided script
+const validateScript = (extension, file) => {
+  if (path.extname(file) === `.${extension}`) {
+    return true;
+  }
+};
+exports.validateScript = validateScript;
