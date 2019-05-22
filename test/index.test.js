@@ -226,3 +226,39 @@ describe('macros', () => {
       .toEqual(['Normal Command', ['Inner Command 1', 'Inner Command 2']]);
   });
 });
+
+describe("constants", async () => {
+  const jarvis = new Jarvis();
+
+  jarvis.addCommand({
+    command: 'say $string',
+    handler: ({ args }) => {
+      return `${args.string}`;
+    }
+  });
+
+  test("define constant", async () => {
+    expect(await jarvis.send('in this context')).toEqual('You are now entering constants. Type the constants, one line at a time. When done, type \'end\'.');
+    await jarvis.send('NAME is JARVIS');
+    await jarvis.send('VERSION is 1');
+    expect(await jarvis.send('Author is John')).toEqual('A constant name should be in block letters.');
+    expect(await jarvis.send('end')).toEqual('Constants "NAME,VERSION" have been added.');
+  });
+
+  test("constant usage in command", async () => {
+    expect(await jarvis.send('say $NAME')).toEqual('JARVIS');
+  });
+
+  test("required constant is not defined", async () => {
+    expect(await jarvis.send('say $TYPE')).toEqual('$TYPE')
+  });
+
+  test("constant usage in macro", async () => {
+    await jarvis.send('how to describe $string');
+    await jarvis.send('say $string');
+    await jarvis.send('say $VERSION');
+    await jarvis.send('end');
+
+    expect(await jarvis.send('describe $NAME')).toEqual(['JARVIS', '1']);
+  });
+});

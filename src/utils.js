@@ -35,8 +35,7 @@ const parseInputTokens = (command, inputTokens) => {
         const patternToken = patternTokens[j];
         if (patternToken.isArg) {
           args[patternToken.value] = inputTokens[j];
-        }
-        else {
+        } else {
           if (inputTokens[j] !== patternToken.value) {
             match = false;
             break;
@@ -63,8 +62,7 @@ const parseMacroInputTokens = (macro, inputTokens) => {
       const patternToken = patternTokens[j];
       if (patternToken.isArg) {
         args[patternToken.value] = inputTokens[j];
-      }
-      else {
+      } else {
         if (inputTokens[j] !== patternToken.value) {
           match = false;
           break;
@@ -94,3 +92,20 @@ const parseMacroSubCommand = (line, args) => {
   return parsedLine;
 };
 exports.parseMacroSubCommand = parseMacroSubCommand;
+
+// change constant tokens to corresponding values
+// returns same string if no constant found
+const parseConstants = (line, constants) => {
+  let constantTokens = line.match(/\$[A-Z][0-9A-Z]*/g);
+  let parsedLine = line;
+  if (constantTokens) {
+    constantTokens.forEach((token) => {
+      let key = token.replace('$', '');
+      if (constants[key]) {
+        parsedLine = parsedLine.replace(token, `"${constants[key]}"`);
+      }
+    })
+  }
+  return parsedLine;
+}
+exports.parseConstants = parseConstants;
