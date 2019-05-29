@@ -262,3 +262,47 @@ describe("constants", async () => {
     expect(await jarvis.send('describe $NAME')).toEqual(['JARVIS', '1']);
   });
 });
+
+describe("scripts", () => {
+  const jarvis = new Jarvis();
+
+  jarvis.addCommand({
+    command: "run hello",
+    handler: ({ args }) => {
+      return `Hello`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "run world",
+    handler: ({ args }) => {
+      return `world`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "load $language",
+    handler: ({ args }) => {
+      return `Running, ${args.language}`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "say $string",
+    handler: ({ args }) => {
+      return `${args.string}`;
+    }
+  });
+
+  test("Run in script mode", async () => {
+    expect(await jarvis.addScriptMode("jarvis", `${__dirname}/resources/test.jarvis`)).toEqual(["Hello", "world", "Running, $language", "$string"]);
+  });
+
+  test("Script file not specified", async () => {
+    expect(await jarvis.addScriptMode("jarvis", null)).toEqual(null);
+  });
+
+  test("Invalid script extension", async () => {
+    expect(await jarvis.addScriptMode("jarvis",`${__dirname}/resources/test.invalid`)).toEqual(null);
+  });
+});

@@ -1,0 +1,4 @@
+run hello
+run world
+load $language
+say $string
