@@ -1,6 +1,6 @@
 const Jarvis = require("../index");
 
-describe("basic command", async () => {
+describe("basic command", () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
     command: "simple",
@@ -26,7 +26,7 @@ describe("basic command", async () => {
   });
 });
 
-describe("interactive command", async () => {
+describe("interactive command",  () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
     command: "repl",
@@ -227,7 +227,7 @@ describe('macros', () => {
   });
 });
 
-describe("constants", async () => {
+describe("constants",  () => {
   const jarvis = new Jarvis();
 
   jarvis.addCommand({
@@ -262,7 +262,6 @@ describe("constants", async () => {
     expect(await jarvis.send('describe $NAME')).toEqual(['JARVIS', '1']);
   });
 });
-
 describe("scripts", () => {
   const jarvis = new Jarvis();
 
