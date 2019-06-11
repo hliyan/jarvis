@@ -21,6 +21,6 @@
   "homepage": "https://github.com/hliyan/jarvis#readme",
   "devDependencies": {
     "coveralls": "^3.0.2",
-    "jest": "^23.6.0"
+    "jest": "^24.8.0"
   }
 }
