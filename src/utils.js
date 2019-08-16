@@ -98,7 +98,7 @@ exports.parseMacroSubCommand = parseMacroSubCommand;
 // change constant tokens to corresponding values
 // returns same string if no constant found
 const parseConstants = (line, constants) => {
-  let constantTokens = line.match(/\$[A-Z][0-9A-Z]*/g);
+  let constantTokens = line.match(/\$[A-Z_][0-9A-Z_]*/g);
   let parsedLine = line;
   if (constantTokens) {
     constantTokens.forEach((token) => {

@@ -26,7 +26,7 @@ describe("basic command", () => {
   });
 });
 
-describe("interactive command",  () => {
+describe("interactive command", () => {
   const jarvis = new Jarvis();
   jarvis.addCommand({
     command: "repl",
@@ -227,7 +227,7 @@ describe('macros', () => {
   });
 });
 
-describe("constants",  () => {
+describe("constants", () => {
   const jarvis = new Jarvis();
 
   jarvis.addCommand({
@@ -241,8 +241,10 @@ describe("constants",  () => {
     expect(await jarvis.send('in this context')).toEqual('You are now entering constants. Type the constants, one line at a time. When done, type \'end\'.');
     await jarvis.send('NAME is JARVIS');
     await jarvis.send('VERSION is 1');
+    await jarvis.send('JOB_ID is 255');
+    await jarvis.send('_IS_LOADED is TRUE')
     expect(await jarvis.send('Author is John')).toEqual('A constant name should be in block letters.');
-    expect(await jarvis.send('end')).toEqual('Constants "NAME,VERSION" have been added.');
+    expect(await jarvis.send('end')).toEqual('Constants "NAME,VERSION,JOB_ID,_IS_LOADED" have been added.');
   });
 
   test("constant usage in command", async () => {
@@ -257,11 +259,14 @@ describe("constants",  () => {
     await jarvis.send('how to describe $string');
     await jarvis.send('say $string');
     await jarvis.send('say $VERSION');
+    await jarvis.send('say $JOB_ID');
+    await jarvis.send('say $_IS_LOADED');
     await jarvis.send('end');
 
-    expect(await jarvis.send('describe $NAME')).toEqual(['JARVIS', '1']);
+    expect(await jarvis.send('describe $NAME')).toEqual(['JARVIS', '1', '255', 'TRUE']);
   });
 });
+
 describe("scripts", () => {
   const jarvis = new Jarvis();
 
@@ -302,6 +307,6 @@ describe("scripts", () => {
   });
 
   test("Invalid script extension", async () => {
-    expect(await jarvis.addScriptMode("jarvis",`${__dirname}/resources/test.invalid`)).toEqual(null);
+    expect(await jarvis.addScriptMode("jarvis", `${__dirname}/resources/test.invalid`)).toEqual(null);
   });
 });
