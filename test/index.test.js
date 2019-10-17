@@ -298,6 +298,13 @@ describe("scripts", () => {
     }
   });
 
+  jarvis.addCommand({
+    command: "run internal command",
+    handler: ({ args }) => {
+      return `Running, internal command`;
+    }
+  });
+
   test("Run in script mode", async () => {
     expect(await jarvis.addScriptMode("jarvis", `${__dirname}/resources/test.jarvis`)).toEqual(["Hello", "world", "Running, $language", "$string"]);
   });
@@ -308,5 +315,19 @@ describe("scripts", () => {
 
   test("Invalid script extension", async () => {
     expect(await jarvis.addScriptMode("jarvis", `${__dirname}/resources/test.invalid`)).toEqual(null);
+  });
+
+  test("Script handler should have script path and extracted commands", async () => {
+    await jarvis.addScriptMode("jarvis", `${__dirname}/resources/script-handler.jarvis`, ({ script, commands }) => {
+      expect(script).toEqual(`${__dirname}/resources/script-handler.jarvis`);
+      expect(commands).toEqual(['run hello', 'run world', 'load JARVIS']);
+    })
+  });
+
+  test("Script handler can run some internal commands", async () => {
+    expect(await jarvis.addScriptMode("jarvis", `${__dirname}/resources/script-handler.jarvis`, async ({ commands }) => {
+      commands.push('run internal command');
+      return commands;
+    })).toEqual['Hello', 'world', 'Running, JARVIS', 'Running, internal command'];
   });
 });

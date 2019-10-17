@@ -25,9 +25,9 @@ class Jarvis {
    * script with specified extension is provided
    * USAGE: jarvis.addScriptMode('jarvis', 'script.jarvis');
    */
-  async addScriptMode(extension, script) {
+  async addScriptMode(extension, script, handler = () => { }) {
     if (script && validateScript(extension, script)) {
-      return await this._runScript(script);
+      return await this._runScript(script, handler);
     }
     return null;
   }
@@ -247,10 +247,12 @@ class Jarvis {
   /**
    * Execute a provided script
    */
-  async _runScript(script) {
+  async _runScript(script, handler) {
     let res = [];
     const commands = parseScript(script);
-    for (const command of commands) {
+    const execResult = await handler({ script, commands });
+    const updatedCommands = execResult ? execResult : commands;
+    for (const command of updatedCommands) {
       res.push(await this.send(command));
     }
     return res;
