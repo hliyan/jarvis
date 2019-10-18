@@ -299,7 +299,7 @@ describe("scripts", () => {
   });
 
   test("Run in script mode", async () => {
-    expect(await jarvis.addScriptMode("jarvis", `${__dirname}/resources/test.jarvis`)).toEqual(["Hello", "world", "Running, $language", "$string"]);
+    expect(await jarvis.addScriptMode("jarvis", `${__dirname}/resources/test.jarvis`)).toEqual(["Hello", "world", "Running, JavaScript", "Bye"]);
   });
 
   test("Script file not specified", async () => {
