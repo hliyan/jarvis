@@ -3,7 +3,8 @@ const {
   tokenize,
   parseInputTokens,
   parseMacroInputTokens,
-  parseMacroSubCommand
+  parseMacroSubCommand,
+  parseScript
 } = require("../src/utils");
 
 describe('tokenize', () => {
@@ -106,3 +107,10 @@ describe('macros', () => {
       .toEqual("run $code");
   });
 });
+
+describe("scripts", () => {
+  test("single line comments", () => {
+    expect(parseScript(`${__dirname}/resources/test.jarvis`))
+      .toEqual(["run hello", "run world", "load JavaScript", "say Bye"]);
+  });
+}); 

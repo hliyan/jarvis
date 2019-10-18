@@ -117,7 +117,7 @@ const parseScript = filename => {
   const content = fs.readFileSync(filename, "utf8");
   const lines = content.split("\n");
   const filteredCommands = lines.filter(line => {
-    return line !== "";
+    return line !== "" && !line.trim().startsWith("#");
   });
   return filteredCommands;
 };

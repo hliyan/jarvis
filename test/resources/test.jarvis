@@ -1,4 +1,5 @@
 run hello
 run world
-load $language
-say $string
+# single line comment
+load JavaScript
+say Bye
