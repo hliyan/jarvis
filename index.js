@@ -6,7 +6,9 @@ const {
   parseMacroSubCommand,
   parseConstants,
   parseScript,
-  validateScript
+  validateScript,
+  getRelativePath,
+  arrayPeek
 } = require("./src/utils");
 
 class Jarvis {
@@ -19,6 +21,9 @@ class Jarvis {
     this.state = {}; // state variables for currently active command
     this.constants = {}; // registered constants
     this.isExecutorActive = false; // state variable for executor status
+    this.scriptStack = []; // running script stack
+    this.sourceScriptPath = null; // source script path
+    this.imports = {} // import script details
   }
 
   /**
@@ -28,6 +33,8 @@ class Jarvis {
    */
   async addScriptMode(extension, script) {
     if (script && validateScript(extension, script)) {
+      this.sourceScriptPath = script;
+      this.scriptStack.push(script);
       return await this._runScript(script);
     }
     return null;
@@ -157,34 +164,57 @@ class Jarvis {
       }
     }
 
+    const currentScript = arrayPeek(this.scriptStack);
     if (line.startsWith("in this context")) {
-      this.activeConstants = [];
+      this.activeConstants = {
+        ...this.activeConstants,
+        [currentScript]: []
+      }
       const out = 'You are now entering constants. Type the constants, one line at a time. When done, type \'end\'.'
       return out;
     }
 
-    if (this.activeConstants) {
+    if (this.activeConstants && this.activeConstants[currentScript]) {
       if (line === 'end') {
         let keyList = [];
-        this.activeConstants.forEach(constant => {
+        this.activeConstants[currentScript].forEach(constant => {
           this.constants[constant.key] = constant.value;
           keyList.push(constant.key);
         })
 
         const out = `Constants "${keyList}" have been added.`;
-        this.activeConstants = null;
         return out;
       }
 
-      let key = line.split(/ is /i)[0].trim();
-      let value = line.split(/ is /i)[1].trim();
+      if (/(.+) is from ['"](.+)['"]/i.test(line)) {
+        let [, resource, path] = line.match(/(.+) is from ['"](.+)['"]/i);
+        const scriptPath = getRelativePath(this.sourceScriptPath, path)
 
-      if (key === key.toUpperCase()) {
-        let constant = { key, value };
-        this.activeConstants.push(constant);
-        return;
-      } else {
-        return 'A constant name should be in block letters.'
+        if (!this.imports[scriptPath]) {
+          this.imports[scriptPath] = [];
+          this.scriptStack.push(scriptPath);
+          await this._runScript(scriptPath);
+          this.scriptStack.pop();
+        }
+
+        // TODO: whitelisting only the imported constants and macros
+        this.imports[scriptPath].push(resource);
+        return `Script: ${scriptPath} imported`;
+      }
+
+      if (/(.+) is (.+)/i.test(line)) {
+        const [, key, value] = line.match(/(.+) is (.+)/i);
+
+        if (this.constants[key]) {
+          return `'${key}' constant already exists!`
+        }
+        else if (key === key.toUpperCase()) {
+          let constant = { key, value };
+          this.activeConstants[currentScript].push(constant);
+          return;
+        } else {
+          return 'A constant name should be in block letters.'
+        }
       }
     }
 

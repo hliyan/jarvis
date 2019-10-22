@@ -255,6 +255,18 @@ describe("constants", () => {
     expect(await jarvis.send('say $TYPE')).toEqual('$TYPE')
   });
 
+  test("redefine constant", async () => {
+    await jarvis.send('in this context');
+    expect(await jarvis.send('NAME is JARVIS')).toEqual(`'NAME' constant already exists!`);
+    await jarvis.send('end');
+  });
+
+  test("invalid constant", async () => {
+    await jarvis.send('in this context');
+    expect(await jarvis.send('NAME s JARVIS')).toEqual(null);
+    await jarvis.send('end');
+  });
+
   test("constant usage in macro", async () => {
     await jarvis.send('how to describe $string');
     await jarvis.send('say $string');
@@ -324,5 +336,42 @@ describe("scripts", () => {
 
   test("Invalid script path", async () => {
     expect(await jarvis.addScriptMode("jarvis", `${__dirname}/invalidPath/test.jarvis`)).toEqual('Could not read file from the specified location!');
+  });
+});
+
+describe("import in script mode", () => {
+  const jarvis = new Jarvis();
+
+  jarvis.addCommand({
+    command: "run hello",
+    handler: ({ args }) => {
+      return `Hello`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "end $bot",
+    handler: ({ args }) => {
+      return `Ending, ${args.bot}`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "load $language",
+    handler: ({ args }) => {
+      return `Running, ${args.language}`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "say $string",
+    handler: ({ args }) => {
+      return `${args.string}`;
+    }
+  });
+
+  test("Import in script mode", async () => {
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `./test/resources/source-script.jarvis`)
+    expect(scriptResponse[scriptResponse.length - 1]).toEqual(['Good Morning', ['Running, JARVIS'], ['Hello', 'Running, BOT', ['Running, layer 3']], 'Ending, BOT']);
   });
 });
