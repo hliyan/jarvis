@@ -1,0 +1,21 @@
+# define constant
+in this context
+    GREETING is "Bye"
+end
+
+# define macro
+how to greet
+    run hello
+    run world
+end
+
+how to depart
+    load JavaScript
+    say $GREETING
+end
+
+# execute macros
+start farewell
+    greet
+    depart
+end

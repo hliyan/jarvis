@@ -18,6 +18,7 @@ class Jarvis {
     this.activeConstants = null; // currently active constants
     this.state = {}; // state variables for currently active command
     this.constants = {}; // registered constants
+    this.isExecutorActive = false; // state variable for executor status
   }
 
   /**
@@ -250,10 +251,28 @@ class Jarvis {
   async _runScript(script) {
     let res = [];
     const commands = parseScript(script);
-    for (const command of commands) {
-      res.push(await this.send(command));
+    if (Array.isArray(commands)) {
+      for (const command of commands) {
+        if (!this.activeConstants && !this.activeMacro) {
+          if (command.startsWith("start")) {
+            this.isExecutorActive = true;
+            continue;
+          }
+          else if (command === 'end') {
+            this.isExecutorActive = false;
+            continue;
+          }
+        }
+        if (this.isExecutorActive || this.activeMacro || this.activeConstants || command.startsWith('in this context')
+          || command.startsWith('how to')) {
+          res.push(await this.send(command));
+        }
+      }
+      return res;
     }
-    return res;
+    else {
+      return commands
+    }
   }
 }
 

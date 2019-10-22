@@ -114,10 +114,19 @@ exports.parseConstants = parseConstants;
 
 // returns string content by reading a script
 const parseScript = filename => {
-  const content = fs.readFileSync(filename, "utf8");
+  let content;
+  try {
+    content = fs.readFileSync(filename, "utf8");
+  } catch (error) {
+    return 'Could not read file from the specified location!';
+  }
   const lines = content.split("\n");
-  const filteredCommands = lines.filter(line => {
-    return line !== "" && !line.trim().startsWith("#");
+  const filteredCommands = [];
+  lines.forEach((line) => {
+    line = line.trim();
+    if (line !== "" && !line.startsWith("#")) {
+      filteredCommands.push(line);
+    }
   });
   return filteredCommands;
 };
