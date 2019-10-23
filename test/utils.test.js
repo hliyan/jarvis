@@ -111,6 +111,6 @@ describe('macros', () => {
 describe("scripts", () => {
   test("single line comments", () => {
     expect(parseScript(`${__dirname}/resources/test.jarvis`))
-      .toEqual(["run hello", "run world", "load JavaScript", "say Bye"]);
+      .toEqual(["start", "run hello", "run world", "load JavaScript", "say Bye", "end"]);
   });
 }); 

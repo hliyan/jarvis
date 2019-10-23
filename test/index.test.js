@@ -302,11 +302,27 @@ describe("scripts", () => {
     expect(await jarvis.addScriptMode("jarvis", `${__dirname}/resources/test.jarvis`)).toEqual(["Hello", "world", "Running, JavaScript", "Bye"]);
   });
 
+  test("Run script with a single executor", async () => {
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `${__dirname}/resources/executor.jarvis`);
+    expect(scriptResponse[scriptResponse.length - 2]).toEqual(["Hello", "world"]);
+    expect(scriptResponse[scriptResponse.length - 1]).toEqual(["Running, JavaScript", "Bye"]);
+  });
+
+  test("Run script with multiple executors", async () => {
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `${__dirname}/resources/executors.jarvis`);
+    expect(scriptResponse[scriptResponse.length - 2]).toEqual(['Hello', 'world']);
+    expect(scriptResponse[scriptResponse.length - 1]).toEqual(['Running, JavaScript', 'Bye']);
+  });
+
   test("Script file not specified", async () => {
     expect(await jarvis.addScriptMode("jarvis", null)).toEqual(null);
   });
 
   test("Invalid script extension", async () => {
     expect(await jarvis.addScriptMode("jarvis", `${__dirname}/resources/test.invalid`)).toEqual(null);
+  });
+
+  test("Invalid script path", async () => {
+    expect(await jarvis.addScriptMode("jarvis", `${__dirname}/invalidPath/test.jarvis`)).toEqual('Could not read file from the specified location!');
   });
 });

@@ -1,5 +1,7 @@
-run hello
-run world
-# single line comment
-load JavaScript
-say Bye
+start
+    run hello
+    run world
+    # single line comment
+    load JavaScript
+    say Bye
+end

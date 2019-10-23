@@ -1,0 +1,25 @@
+# sample constant
+in this context
+    GREETING is "Bye"
+end
+
+# sample macro
+how to greet
+    run hello
+    run world
+end
+
+how to depart
+    load JavaScript
+    say $GREETING
+end
+
+# first execution block
+start welcome
+    greet
+end
+
+# second execution block
+start farewell
+    depart
+end
