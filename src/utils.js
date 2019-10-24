@@ -1,5 +1,3 @@
-const URL = require('url');
-
 // jarvis, just another rudimentary verbal interface shell
 // converts 'hello "John Doe"' to ['hello', 'John, Doe']
 const fs = require("fs");
@@ -141,15 +139,3 @@ const validateScript = (extension, file) => {
   }
 };
 exports.validateScript = validateScript;
-
-// combine the base path with relative import path
-const getRelativePath = (basePath, scriptPath) => {
-  return URL.resolve(basePath, scriptPath);
-}
-exports.getRelativePath = getRelativePath;
-
-// get the top value of an array
-const arrayPeek = (array) => {
-  return array.length > 0 ? array[array.length - 1] : null;
-}
-exports.arrayPeek = arrayPeek;

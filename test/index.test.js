@@ -374,4 +374,9 @@ describe("import in script mode", () => {
     const scriptResponse = await jarvis.addScriptMode("jarvis", `./test/resources/source-script.jarvis`)
     expect(scriptResponse[scriptResponse.length - 1]).toEqual(['Good Morning', ['Running, JARVIS'], ['Hello', 'Running, BOT', ['Running, layer 3']], 'Ending, BOT']);
   });
+
+  test("Import macros with arguments in script mode", async () => {
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `./test/resources/import-with-arguments.jarvis`)
+    expect(scriptResponse[scriptResponse.length - 1]).toEqual(['Running, JARVIS']);
+  });
 });

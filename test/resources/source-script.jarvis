@@ -12,4 +12,6 @@ how to describe bot
     end $USER
 end
 
-describe bot
+start the bot
+    describe bot
+end
