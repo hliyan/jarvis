@@ -1,0 +1,7 @@
+in this context
+    load user $name is from './import-script-3.jarvis'
+end
+
+start JARVIS
+    load user JARVIS
+end

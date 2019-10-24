@@ -1,0 +1,17 @@
+in this context 
+    start jarvis is from "./import-script-1.jarvis"
+    start bot is from './import-script-2.jarvis'
+    USER is from './import-script-2.jarvis'
+    GREETING is Good Morning
+end
+
+how to describe bot
+    say $GREETING
+    start jarvis
+    start bot
+    end $USER
+end
+
+start the bot
+    describe bot
+end

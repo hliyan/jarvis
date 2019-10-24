@@ -1,0 +1,10 @@
+in this context
+    USER is BOT 
+    try nested import is from './import-script-3.jarvis'
+end
+
+how to start bot
+    run hello
+    load $USER
+    try nested import
+end
