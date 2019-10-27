@@ -283,6 +283,13 @@ describe("scripts", () => {
   const jarvis = new Jarvis();
 
   jarvis.addCommand({
+    command: "start jarvis",
+    handler: ({ args }) => {
+      return `Started jarvis`;
+    }
+  });
+
+  jarvis.addCommand({
     command: "run hello",
     handler: ({ args }) => {
       return `Hello`;
@@ -316,7 +323,8 @@ describe("scripts", () => {
 
   test("Run script with a single executor", async () => {
     const scriptResponse = await jarvis.addScriptMode("jarvis", `${__dirname}/resources/executor.jarvis`);
-    expect(scriptResponse[scriptResponse.length - 2]).toEqual(["Hello", "world"]);
+    expect(scriptResponse[scriptResponse.length - 3]).toEqual(["Hello", "world"]);
+    expect(scriptResponse[scriptResponse.length - 2]).toEqual(["Started jarvis"]);
     expect(scriptResponse[scriptResponse.length - 1]).toEqual(["Running, JavaScript", "Bye"]);
   });
 
@@ -335,7 +343,11 @@ describe("scripts", () => {
   });
 
   test("Invalid script path", async () => {
-    expect(await jarvis.addScriptMode("jarvis", `${__dirname}/invalidPath/test.jarvis`)).toEqual('Could not read file from the specified location!');
+    try {
+      await jarvis.addScriptMode("jarvis", `${__dirname}/invalidPath/test.jarvis`)
+    } catch (error) {
+      expect(error.message).toEqual('Could not read file from the specified location!');
+    }
   });
 });
 

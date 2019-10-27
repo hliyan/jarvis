@@ -118,15 +118,11 @@ const parseScript = filename => {
   try {
     content = fs.readFileSync(filename, "utf8");
   } catch (error) {
-    return 'Could not read file from the specified location!';
+    throw new Error('Could not read file from the specified location!');
   }
   const lines = content.split("\n");
-  const filteredCommands = [];
-  lines.forEach((line) => {
-    line = line.trim();
-    if (line !== "" && !line.startsWith("#")) {
-      filteredCommands.push(line);
-    }
+  const filteredCommands = lines.filter(line => {
+    return line !== "" && !line.trim().startsWith("#");
   });
   return filteredCommands;
 };

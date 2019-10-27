@@ -9,6 +9,10 @@ how to greet
     run world
 end
 
+how to work
+    start jarvis
+end
+
 how to depart
     load JavaScript
     say $GREETING
@@ -17,5 +21,6 @@ end
 # execute macros
 start farewell
     greet
+    work
     depart
 end

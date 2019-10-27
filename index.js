@@ -19,7 +19,7 @@ class Jarvis {
     this.activeContext = null; // temporally holding details of currently active constants and imports in command `in this context`
     this.state = {}; // state variables for currently active command
     this.constants = {}; // registered constants
-    this.isExecutorActive = false; // state variable for executor status
+    this.isInStartBlock = false; // state variable to check whether inside start block
     this.importStack = [__filename]; // use at the time of interpretation to keep track of the import hierarchy in files, default value as current file which used in CLI mode
     this.baseScriptPath = __filename; // the path of the file with which jarvis was invoked. used for resolving import paths, default value as current file which used in CLI mode
     this.importScriptDetails = {}; // contains the imported constants and macros based on the imported script path, USAGE: {'./test.jarvis': ['BASE_URL']}
@@ -200,7 +200,7 @@ class Jarvis {
         return out;
       }
 
-      /** 
+      /**
        * checks whether the `line` is in the format of import script
        * if so it extracts the importing resource (`constant` or `macro`) and the `path`
        * then import the file if it is not already imported
@@ -222,7 +222,7 @@ class Jarvis {
         }
 
         /**
-         * TODO: 
+         * TODO:
          * whitelisting only the imported constants and macros
          */
         this.importScriptDetails[scriptPath].push(resource);
@@ -314,27 +314,41 @@ class Jarvis {
   async _runScript(script) {
     let res = [];
     const commands = parseScript(script);
-    if (Array.isArray(commands)) {
-      for (const command of commands) {
-        if (!this.activeContext && !this.activeMacro) {
-          if (command.startsWith("start")) {
-            this.isExecutorActive = true;
-            continue;
-          }
-          else if (command === 'end') {
-            this.isExecutorActive = false;
-            continue;
-          }
+    for (const command of commands) {
+      if (this._isInGlobalScope()) {
+        if (command.startsWith("start")) {
+          this.isInStartBlock = true;
+          continue;
         }
-        if (this.isExecutorActive || this.activeMacro || this.activeContext || command.startsWith('in this context')
-          || command.startsWith('how to')) {
-          res.push(await this.send(command));
+        else if (command === 'end') {
+          this.isInStartBlock = false;
+          continue;
         }
       }
-      return res;
+      if (this._isInExecutableContext(command)) {
+        res.push(await this.send(command));
+      }
     }
-    else {
-      return commands
+    return res;
+  }
+
+  /**
+   * Check whether a specific line is in executable context
+   */
+  _isInExecutableContext(line) {
+    // line is sent to shell if inside a start block or if an active macro/a context exist or if special keyword
+    if (this.isInStartBlock || !this._isInGlobalScope() || line.startsWith('in this context')
+      || line.startsWith('how to')) {
+      return true;
+    }
+  }
+
+  /**
+   * Check for global scope
+   */
+  _isInGlobalScope() {
+    if (!this.activeContext && !this.activeMacro) {
+      return true;
     }
   }
 }
