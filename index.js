@@ -257,6 +257,13 @@ class Jarvis {
   }
 
   /**
+   * Wrapper for the event emitter
+   */
+  on(event, callback) {
+    this.eventEmitter.on(event, callback);
+  }
+
+  /**
    * if the 'line' is not found in commands
    * it will search in macros
    */

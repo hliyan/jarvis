@@ -426,7 +426,7 @@ describe("Event emitter", () => {
 
   test("Command events", async () => {
     const emitObjectArray = [];
-    jarvis.eventEmitter.on('command', (res) => {
+    jarvis.on('command', (res) => {
       emitObjectArray.push(res);
     });
 
