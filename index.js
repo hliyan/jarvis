@@ -1,4 +1,5 @@
 const URL = require('url');
+const events = require('events');
 const {
   parseCommand,
   tokenize,
@@ -23,6 +24,7 @@ class Jarvis {
     this.importStack = [__filename]; // use at the time of interpretation to keep track of the import hierarchy in files, default value as current file which used in CLI mode
     this.baseScriptPath = __filename; // the path of the file with which jarvis was invoked. used for resolving import paths, default value as current file which used in CLI mode
     this.importScriptDetails = {}; // contains the imported constants and macros based on the imported script path, USAGE: {'./test.jarvis': ['BASE_URL']}
+    this.eventEmitter = new events.EventEmitter(); // use at the time of script interpretation to emit the responses in run time
   }
 
   /**
@@ -255,6 +257,13 @@ class Jarvis {
   }
 
   /**
+   * Wrapper for the event emitter
+   */
+  on(event, callback) {
+    this.eventEmitter.on(event, callback);
+  }
+
+  /**
    * if the 'line' is not found in commands
    * it will search in macros
    */
@@ -326,7 +335,15 @@ class Jarvis {
         }
       }
       if (this._isInExecutableContext(command)) {
-        res.push(await this.send(command));
+        const response = await this.send(command);
+        /**
+         * Emits the response along with the corresponding command
+         * so the listener can get the response via `command` event in run time
+         */
+        if (this.isInStartBlock) {
+          this.eventEmitter.emit('command', { command, response });
+        }
+        res.push(response);
       }
     }
     return res;

@@ -392,3 +392,50 @@ describe("import in script mode", () => {
     expect(scriptResponse[scriptResponse.length - 1]).toEqual(['Running, JARVIS']);
   });
 });
+
+describe("Event emitter", () => {
+  const jarvis = new Jarvis();
+
+  jarvis.addCommand({
+    command: "run hello",
+    handler: ({ args }) => {
+      return `Hello`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "run world",
+    handler: ({ args }) => {
+      return `world`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "load $language",
+    handler: ({ args }) => {
+      return `Running, ${args.language}`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "say $string",
+    handler: ({ args }) => {
+      return `${args.string}`;
+    }
+  });
+
+  test("Command events", async () => {
+    const emitObjectArray = [];
+    jarvis.on('command', (res) => {
+      emitObjectArray.push(res);
+    });
+
+    await jarvis.addScriptMode("jarvis", `./test/resources/test.jarvis`);
+    expect(emitObjectArray).toEqual([
+      { "command": "    run hello", "response": "Hello" },
+      { "command": "    run world", "response": "world" },
+      { "command": "    load JavaScript", "response": "Running, JavaScript" },
+      { "command": "    say Bye", "response": "Bye" }
+    ])
+  });
+});
