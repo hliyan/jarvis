@@ -1,0 +1,14 @@
+# define constant
+in this context
+    GREETING_STRING is "Hello"
+    JARVIS_JSON is from "./json/sample-invalid.json"
+end
+
+how to log $greeting
+    run $GREETING_STRING
+    run $greeting
+end
+
+start json test
+    log $JARVIS_JSON
+end

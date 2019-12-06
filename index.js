@@ -9,6 +9,7 @@ const {
   parseConstants,
   parseScript,
   validateScript,
+  importJson
 } = require("./src/utils");
 
 class Jarvis {
@@ -93,11 +94,30 @@ class Jarvis {
     const inputTokens = tokenize(line);
     for (let i = 0; i < this.commands.length; i++) {
       const command = this.commands[i];
-      if (parseInputTokens(command, inputTokens)) {
+      if (parseInputTokens(command, inputTokens, this.constants)) {
         return command;
       }
     }
     return null;
+  }
+
+  /**
+   * validate the constant format
+   * if a valid constant, add to active constant storage (temporally)
+   * used in constant declaration and JSON import 
+   */
+  _setConstant(key, value) {
+    if (!/[A-Z_][0-9A-Z_]/.test(key)) {
+      return 'A constant name should be in block letters.';
+    } else if (this.constants[key]) {
+      return `'${key}' constant already exists!`;
+    } else {
+      // get the top most value of the stack which is currently active script
+      const currentScriptPath = this.importStack[this.importStack.length - 1];
+      let constant = { key, value };
+      this.activeContext[currentScriptPath].push(constant);
+      return;
+    }
   }
 
   /**
@@ -113,7 +133,7 @@ class Jarvis {
       context: this,
       line,
       tokens: inputTokens,
-      args: command ? parseInputTokens(command, inputTokens).args : {}
+      args: command ? parseInputTokens(command, inputTokens, this.constants).args : {}
     });
   }
 
@@ -213,6 +233,16 @@ class Jarvis {
         const scriptPath = URL.resolve(this.baseScriptPath, relativeScriptPath);
 
         /**
+         * checks whether the importing file is a JSON
+         * if so parse the JSON file to a JSON object
+         * then save the JSON object as a constant
+         */
+        if (scriptPath && /(.)+.json$/gi.test(scriptPath)) {
+          const jsonObject = importJson(scriptPath);
+          return this._setConstant(resource, jsonObject);
+        }
+
+        /**
          * checks whether the importing file is already imported
          * if not add the script path to stack and run the importing script
          */
@@ -233,23 +263,12 @@ class Jarvis {
 
       /**
        * checks whether the `line` is in the format of constant definition
-       * if so it extracts the `key` and `value` and do the constant validations
-       * if a valid constant, add to active constant storage (temporally)
+       * if so it extracts the `key` and `value` and set the constant
        */
-      const constantParams = line.match(/(.+) is (.+)/i);
+      const constantParams = line.match(/(.+) is ['"](.+)['"]/i);
       if (constantParams) {
         const [, key, value] = constantParams;
-
-        if (this.constants[key]) {
-          return `'${key}' constant already exists!`
-        }
-        else if (key === key.toUpperCase()) {
-          let constant = { key, value };
-          this.activeContext[currentScriptPath].push(constant);
-          return;
-        } else {
-          return 'A constant name should be in block letters.'
-        }
+        return this._setConstant(key, value);
       }
     }
 

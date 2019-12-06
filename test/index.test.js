@@ -239,11 +239,11 @@ describe("constants", () => {
 
   test("define constant", async () => {
     expect(await jarvis.send('in this context')).toEqual('You are now entering constants. Type the constants, one line at a time. When done, type \'end\'.');
-    await jarvis.send('NAME is JARVIS');
-    await jarvis.send('VERSION is 1');
-    await jarvis.send('JOB_ID is 255');
-    await jarvis.send('_IS_LOADED is TRUE')
-    expect(await jarvis.send('Author is John')).toEqual('A constant name should be in block letters.');
+    await jarvis.send('NAME is "JARVIS"');
+    await jarvis.send('VERSION is "1"');
+    await jarvis.send('JOB_ID is "255"');
+    await jarvis.send('_IS_LOADED is "TRUE"')
+    expect(await jarvis.send('Author is "John"')).toEqual('A constant name should be in block letters.');
     expect(await jarvis.send('end')).toEqual('Constants "NAME,VERSION,JOB_ID,_IS_LOADED" have been added.');
   });
 
@@ -257,7 +257,7 @@ describe("constants", () => {
 
   test("redefine constant", async () => {
     await jarvis.send('in this context');
-    expect(await jarvis.send('NAME is JARVIS')).toEqual(`'NAME' constant already exists!`);
+    expect(await jarvis.send('NAME is "JARVIS"')).toEqual(`'NAME' constant already exists!`);
     await jarvis.send('end');
   });
 
@@ -437,5 +437,29 @@ describe("Event emitter", () => {
       { "command": "    load JavaScript", "response": "Running, JavaScript" },
       { "command": "    say Bye", "response": "Bye" }
     ])
+  });
+});
+
+describe("JSON imports", () => {
+  const jarvis = new Jarvis();
+
+  jarvis.addCommand({
+    command: "run $argument",
+    handler: ({ args: { argument } }) => {
+      return argument;
+    }
+  });
+
+  test("Script with a JSON import", async () => {
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `${__dirname}/resources/json-import.jarvis`);
+    expect(scriptResponse[scriptResponse.length - 1]).toEqual(['Hello', { name: 'JARVIS Interpreter', version: 'version 1.0.0' }]);
+  });
+
+  test("Invalid JSON import", async () => {
+    try {
+      await jarvis.addScriptMode("jarvis", `${__dirname}/resources/json-invalid-import.jarvis`);
+    } catch (error) {
+      expect(error.message).toEqual('Invalid JSON import!');
+    }
   });
 });

@@ -1,7 +1,8 @@
 // jarvis, just another rudimentary verbal interface shell
-// converts 'hello "John Doe"' to ['hello', 'John, Doe']
 const fs = require("fs");
 const path = require("path");
+
+// converts 'hello "John Doe"' to ['hello', 'John Doe']
 const tokenize = line => {
   const tokens = line.match(/"([^"]+)"|\S+/g);
   for (let i = 0; i < tokens.length; i++) {
@@ -27,7 +28,7 @@ exports.parseCommand = parseCommand;
 
 // checks tokens against all the patterns in the command
 // returns args if match, else null
-const parseInputTokens = (command, inputTokens) => {
+const parseInputTokens = (command, inputTokens, constants) => {
   for (let i = 0; i < command.patterns.length; i++) { // for each pattern
     const patternTokens = command.patterns[i].tokens;
     if (patternTokens.length === inputTokens.length) {
@@ -36,7 +37,11 @@ const parseInputTokens = (command, inputTokens) => {
       for (let j = 0; j < patternTokens.length; j++) { // for each token in pattern
         const patternToken = patternTokens[j];
         if (patternToken.isArg) {
-          args[patternToken.value] = inputTokens[j];
+          // checks whether the given token is a JSON object, if so inject it to args as an object
+          // used in JARVIS handlers
+          const constantArg = parseJson(inputTokens[j], constants);
+          const parsedArg = constantArg ? constantArg : inputTokens[j];
+          args[patternToken.value] = parsedArg;
         } else {
           if (inputTokens[j] !== patternToken.value) {
             match = false;
@@ -102,8 +107,9 @@ const parseConstants = (line, constants) => {
   let parsedLine = line;
   if (constantTokens) {
     constantTokens.forEach((token) => {
-      let key = token.replace('$', '');
-      if (constants[key]) {
+      const key = token.replace('$', '');
+      const constantValue = constants[key];
+      if (constantValue && (typeof constantValue === 'string')) {
         parsedLine = parsedLine.replace(token, `"${constants[key]}"`);
       }
     })
@@ -135,3 +141,28 @@ const validateScript = (extension, file) => {
   }
 };
 exports.validateScript = validateScript;
+
+// read and parse the JSON file
+const importJson = (filename) => {
+  let content;
+  try {
+    content = fs.readFileSync(filename, "utf8");
+    return JSON.parse(content);
+  } catch (error) {
+    throw new Error('Invalid JSON import!');
+  }
+}
+exports.importJson = importJson;
+
+// checks whether the given argument is referring to an JSON object
+// if so returns the corresponding object, else returns null
+const parseJson = (argument, constants) => {
+  if (argument.startsWith('$')) {
+    const key = argument.replace('$', '');
+    const constantValue = constants[key];
+    if (constantValue && typeof constantValue === 'object') {
+      return constantValue;
+    }
+  }
+  return null;
+}
