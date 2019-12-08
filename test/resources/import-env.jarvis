@@ -1,0 +1,14 @@
+in this context
+    PROGRAM is from env
+    NOT_DEFINED is from env
+end
+
+how to work
+    run hello
+    load $PROGRAM
+end
+
+start test
+    work
+end
+

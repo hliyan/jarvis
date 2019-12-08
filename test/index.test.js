@@ -402,6 +402,46 @@ describe("import in script mode", () => {
   });
 });
 
+describe("Import from environment file", () => {
+  const jarvis = new Jarvis();
+
+  jarvis.addCommand({
+    command: "run hello",
+    handler: () => {
+      return `Hello`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "load $language",
+    handler: ({ args }) => {
+      return `Running, ${args.language}`;
+    }
+  });
+
+  jarvis.addCommand({
+    command: "say $string",
+    handler: ({ args }) => {
+      return `${args.string}`;
+    }
+  });
+
+  test("Import constants from env", async () => {
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `./test/resources/import-env.jarvis`, `./test/resources/.jarvisrc`);
+    expect(scriptResponse[scriptResponse.length - 1]).toEqual(['Hello', 'Running, JARVIS']);
+  });
+
+  test("Import env with invalid syntax", async () => {
+    const scriptResponse = await jarvis.addScriptMode("invalid", `./test/resources/import-env.invalid`, `./test/resources/.invalidrc`);
+    expect(scriptResponse).toEqual('Invalid syntax in env file!');
+  });
+
+  test("Import env with invalid file path", async () => {
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `./test/resources/import-env.jarvis`, `./test/invalidDir/.jarvisrc`)
+    expect(scriptResponse).toEqual('Could not read env file from specified location!');
+  });
+});
+
 describe("Event emitter", () => {
   const jarvis = new Jarvis();
 
