@@ -6,9 +6,9 @@ const {
   parseInputTokens,
   parseMacroInputTokens,
   parseMacroSubCommand,
-  parseConstants,
   parseScript,
   validateScript,
+  importJson
 } = require("./src/utils");
 
 class Jarvis {
@@ -101,19 +101,63 @@ class Jarvis {
   }
 
   /**
+   * checks whether the constant format is found in the tokens
+   * if found replace the constant with the corresponding value
+   * else leaves the token as it is
+   * returns the parsed token array at the end
+   */
+  _parseConstants(tokens) {
+    return tokens.map((token) => {
+      const innerConstants = token.match(/\$[A-Z_][0-9A-Z_]*/g);
+      if (innerConstants) {
+        /**
+         * if a token is an exact constant match
+         * returns the corresponding value of the constant
+         * return value is either a string or an object 
+         * ex: token = "$HOST" returns "google.lk"
+         * ex: token = "$APP_OBJECT" returns {name: "JARVIS"}
+         */
+        if (innerConstants.length === 1 && token === innerConstants[0]) {
+          const key = token.replace('$', '');
+          const value = this.constants[key];
+          return value ? value : token;
+        }
+
+        /**
+         * if a token string contains constants within the string
+         * returns the constant replaced string
+         * return value is a string (objects are stringified)
+         * ex: token = "$HOST/$API_VERSION/index.html" returns "google.lk/v1/index.html"
+         * ex: token = "Object: $JSON_OBJECT" returns "Object: {"name": "JARVIS"}"
+         */
+        innerConstants.forEach((innerConstant) => {
+          const key = innerConstant.replace('$', '');
+          const value = this.constants[key];
+          if (value) {
+            token = (typeof value === 'object') ? token.replace(innerConstant, JSON.stringify(value)) : token.replace(innerConstant, value);
+          }
+        })
+      }
+      return token;
+    })
+  }
+
+  /**
+   * parses the constant to corresponding values 
    * if command is null, then consider as accepting prompted input
    * for the active command
+   * then run the command handler with the arguments
    */
   async _runCommand(command, line) {
-    line = parseConstants(line, this.constants);
     const inputTokens = tokenize(line);
+    const constantParsedTokens = this._parseConstants(inputTokens);
     const handler = command ? command.handler : this.activeCommand.handler;
 
     return await handler({
       context: this,
       line,
       tokens: inputTokens,
-      args: command ? parseInputTokens(command, inputTokens).args : {}
+      args: command ? parseInputTokens(command, constantParsedTokens).args : {}
     });
   }
 
@@ -221,14 +265,24 @@ class Jarvis {
       }
 
       /**
-       * checks whether the `line` is in the format of import script
-       * if so it extracts the importing resource (`constant` or `macro`) and the `path`
-       * then import the file if it is not already imported
+       * checks whether the `line` is in the format of import script or JSON import
+       * if so it extracts the importing resource (`constant`, `macro` or `JSON`) and the `path`
+       * then import the file if it is not already imported or set the constant if a JSON import
        */
       const importParams = line.match(/(.+) is from ['"](.+)['"]/i);
       if (importParams) {
         const [, resource, relativeScriptPath] = importParams;
         const scriptPath = URL.resolve(this.baseScriptPath, relativeScriptPath);
+
+        /**
+         * checks whether the importing file is a JSON
+         * if so parse the JSON file to a JSON object
+         * then save the JSON object as a constant
+         */
+        if (scriptPath && /(.)+.json$/gi.test(scriptPath)) {
+          const jsonObject = importJson(scriptPath);
+          return this._setConstantInActiveContext(resource, jsonObject);
+        }
 
         /**
          * checks whether the importing file is already imported
@@ -302,7 +356,6 @@ class Jarvis {
   async _runMacro(macro) {
     let subCommandsStatus = [];
     for (let line of macro.subCommands) {
-      line = parseConstants(line, this.constants);
       line = parseMacroSubCommand(line, macro.args);
       subCommandsStatus.push(await this._execute(line));
     }
@@ -313,7 +366,6 @@ class Jarvis {
    * Find the macro by sending macro name
    */
   _findMacro(line) {
-    line = parseConstants(line, this.constants);
     const inputTokens = tokenize(line);
     for (let i = 0; i < this.macros.length; i++) {
       const macro = this.macros[i];
