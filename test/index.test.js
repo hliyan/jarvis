@@ -239,11 +239,11 @@ describe("constants", () => {
 
   test("define constant", async () => {
     expect(await jarvis.send('in this context')).toEqual('You are now entering constants. Type the constants, one line at a time. When done, type \'end\'.');
-    await jarvis.send('NAME is JARVIS');
-    await jarvis.send('VERSION is 1');
-    await jarvis.send('JOB_ID is 255');
-    await jarvis.send('_IS_LOADED is TRUE')
-    expect(await jarvis.send('Author is John')).toEqual('A constant name should be in block letters.');
+    await jarvis.send('NAME is "JARVIS"');
+    await jarvis.send('VERSION is "1"');
+    await jarvis.send('JOB_ID is "255"');
+    await jarvis.send('_IS_LOADED is "TRUE"')
+    expect(await jarvis.send('Author is "John"')).toEqual('A constant name should be in block letters.');
     expect(await jarvis.send('end')).toEqual('Constants "NAME,VERSION,JOB_ID,_IS_LOADED" have been added.');
   });
 
@@ -257,7 +257,7 @@ describe("constants", () => {
 
   test("redefine constant", async () => {
     await jarvis.send('in this context');
-    expect(await jarvis.send('NAME is JARVIS')).toEqual(`'NAME' constant already exists!`);
+    expect(await jarvis.send('NAME is "JARVIS"')).toEqual(`'NAME' constant already exists!`);
     await jarvis.send('end');
   });
 
