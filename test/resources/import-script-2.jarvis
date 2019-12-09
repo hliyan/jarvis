@@ -1,6 +1,6 @@
 in this context
-    USER is BOT 
-    try nested import is from './import-script-3.jarvis'
+    USER is "BOT"
+    try nested import is from "./import-script-3.jarvis"
 end
 
 how to start bot

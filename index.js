@@ -118,6 +118,24 @@ class Jarvis {
   }
 
   /**
+   * validate the constant format,
+   * if valid, add the constant to active context
+   * else return an error message
+   */
+  _setConstantInActiveContext(key, value) {
+    if (!/[A-Z_][0-9A-Z_]/.test(key)) {
+      return 'A constant name should be in block letters.';
+    }
+    if (this.constants[key]) {
+      return `'${key}' constant already exists!`;
+    }
+    // get the top most value of the stack which is the currently active script
+    const currentScriptPath = this.importStack[this.importStack.length - 1];
+    let constant = { key, value };
+    this.activeContext[currentScriptPath].push(constant);
+  }
+
+  /**
    * Sends a command to the shell
    */
   async send(line) {
@@ -233,23 +251,12 @@ class Jarvis {
 
       /**
        * checks whether the `line` is in the format of constant definition
-       * if so it extracts the `key` and `value` and do the constant validations
-       * if a valid constant, add to active constant storage (temporally)
+       * if so it extracts the `key` and `value` and set it in the active context
        */
-      const constantParams = line.match(/(.+) is (.+)/i);
+      const constantParams = line.match(/(.+) is ['"](.+)['"]/i);
       if (constantParams) {
         const [, key, value] = constantParams;
-
-        if (this.constants[key]) {
-          return `'${key}' constant already exists!`
-        }
-        else if (key === key.toUpperCase()) {
-          let constant = { key, value };
-          this.activeContext[currentScriptPath].push(constant);
-          return;
-        } else {
-          return 'A constant name should be in block letters.'
-        }
+        return this._setConstantInActiveContext(key, value);
       }
     }
 
