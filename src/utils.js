@@ -95,23 +95,6 @@ const parseMacroSubCommand = (line, args) => {
 };
 exports.parseMacroSubCommand = parseMacroSubCommand;
 
-// change constant tokens to corresponding values
-// returns same string if no constant found
-const parseConstants = (line, constants) => {
-  let constantTokens = line.match(/\$[A-Z_][0-9A-Z_]*/g);
-  let parsedLine = line;
-  if (constantTokens) {
-    constantTokens.forEach((token) => {
-      let key = token.replace('$', '');
-      if (constants[key]) {
-        parsedLine = parsedLine.replace(token, `"${constants[key]}"`);
-      }
-    })
-  }
-  return parsedLine;
-}
-exports.parseConstants = parseConstants;
-
 // returns string content by reading a script
 const parseScript = filename => {
   let content;
@@ -135,3 +118,18 @@ const validateScript = (extension, file) => {
   }
 };
 exports.validateScript = validateScript;
+
+// read and parse the JSON file
+const importJson = (filename) => {
+  try {
+    const content = fs.readFileSync(filename, "utf8");
+    return JSON.parse(content);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      throw new Error('Could not read the JSON file from the specified location!');
+    } else {
+      throw new Error('Invalid JSON import!');
+    }
+  }
+}
+exports.importJson = importJson;

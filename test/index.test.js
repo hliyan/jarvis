@@ -251,6 +251,15 @@ describe("constants", () => {
     expect(await jarvis.send('say $NAME')).toEqual('JARVIS');
   });
 
+  test("more than one constant in one argument", async () => {
+    expect(await jarvis.send('say "$NAME is an interpreter"')).toEqual('JARVIS is an interpreter');
+    expect(await jarvis.send('say "Name: $NAME, Version: $VERSION"')).toEqual('Name: JARVIS, Version: 1');
+  });
+
+  test("more than one constant in one argument: some constants are not defined", async () => {
+    expect(await jarvis.send('say "Name: $NAME, Mode: $MODE"')).toEqual('Name: JARVIS, Mode: $MODE');
+  });
+
   test("required constant is not defined", async () => {
     expect(await jarvis.send('say $TYPE')).toEqual('$TYPE')
   });
@@ -437,5 +446,38 @@ describe("Event emitter", () => {
       { "command": "    load JavaScript", "response": "Running, JavaScript" },
       { "command": "    say Bye", "response": "Bye" }
     ])
+  });
+});
+
+describe("JSON imports", () => {
+  const jarvis = new Jarvis();
+
+  jarvis.addCommand({
+    command: "run $argument",
+    handler: ({ args: { argument } }) => {
+      return argument;
+    }
+  });
+
+  test("script with a JSON import", async () => {
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `${__dirname}/resources/json-import.jarvis`);
+    expect(scriptResponse[scriptResponse.length - 1])
+      .toEqual(['Hello', { name: 'JARVIS Interpreter', version: 'version 1.0.0' }, 'JSON Object: {"name":"JARVIS Interpreter","version":"version 1.0.0"}']);
+  });
+
+  test("script with a invalid JSON import", async () => {
+    try {
+      await jarvis.addScriptMode("jarvis", `${__dirname}/resources/invalid-json-import.jarvis`);
+    } catch (error) {
+      expect(error.message).toEqual('Invalid JSON import!');
+    }
+  });
+
+  test("script with a invalid JSON file path ", async () => {
+    try {
+      await jarvis.addScriptMode("jarvis", `${__dirname}/resources/invalid-json-path-import.jarvis`);
+    } catch (error) {
+      expect(error.message).toEqual('Could not read the JSON file from the specified location!');
+    }
   });
 });

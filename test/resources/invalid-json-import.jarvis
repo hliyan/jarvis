@@ -1,0 +1,5 @@
+# define constant
+in this context
+    GREETING_STRING is "Hello"
+    JARVIS_JSON is from "./json/sample-invalid.json"
+end
