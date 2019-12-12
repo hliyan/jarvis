@@ -8,7 +8,8 @@ const {
   parseMacroSubCommand,
   parseScript,
   validateScript,
-  importJson
+  importJson,
+  validateEnvFileName
 } = require("./src/utils");
 
 class Jarvis {
@@ -20,6 +21,7 @@ class Jarvis {
     this.activeContext = null; // temporally holding details of currently active constants and imports in command `in this context`
     this.state = {}; // state variables for currently active command
     this.constants = {}; // registered constants
+    this.environmentVariables = {};// store extracted environment variables
     this.isInStartBlock = false; // state variable to check whether inside start block
     this.importStack = [__filename]; // use at the time of interpretation to keep track of the import hierarchy in files, default value as current file which used in CLI mode
     this.baseScriptPath = __filename; // the path of the file with which jarvis was invoked. used for resolving import paths, default value as current file which used in CLI mode
@@ -29,17 +31,23 @@ class Jarvis {
 
   /**
    * Checks for available scripts to switch mode to script mode if a
-   * script with specified extension is provided
+   * script and env file(optional parameter) with specified extension is provided
    * re-initialize the base script path according to given script
-   * USAGE: jarvis.addScriptMode('jarvis', 'script.jarvis');
+   * USAGE: jarvis.addScriptMode('jarvis', 'script.jarvis', '.jarvisrc');
    */
-  async addScriptMode(extension, script) {
-    if (script && validateScript(extension, script)) {
-      this.baseScriptPath = script;
-      this.importStack = [script];
-      return await this._runScript(script);
+  async addScriptMode(extension, script, envFile) {
+    if (!(script && validateScript(extension, script))) {
+      return null;
     }
-    return null;
+    if (envFile && validateEnvFileName(`${extension}rc`, envFile)) {
+      const res = await this._loadEnvFile(envFile);
+      if (res.error) {
+        return res.error;
+      }
+    }
+    this.baseScriptPath = script;
+    this.importStack = [script];
+    return await this._runScript(script);
   }
 
   /**
@@ -113,7 +121,7 @@ class Jarvis {
         /**
          * if a token is an exact constant match
          * returns the corresponding value of the constant
-         * return value is either a string or an object 
+         * return value is either a string or an object
          * ex: token = "$HOST" returns "google.lk"
          * ex: token = "$APP_OBJECT" returns {name: "JARVIS"}
          */
@@ -143,7 +151,7 @@ class Jarvis {
   }
 
   /**
-   * parses the constant to corresponding values 
+   * parses the constant to corresponding values
    * if command is null, then consider as accepting prompted input
    * for the active command
    * then run the command handler with the arguments
@@ -262,6 +270,20 @@ class Jarvis {
         }
         const out = `Constants "${keyList}" have been added.`;
         return out;
+      }
+
+      /**
+       * handle constant imports from env file
+       * check whether the constant is available within loaded constants from env file
+       */
+      const envParams = line.match(/(.+) is from env/);
+      if (envParams) {
+        const [, envKey] = envParams;
+        if (!this.environmentVariables[envKey]) {
+          return `${envKey} is not defined in env file!`
+        }
+        this._setConstantInActiveContext(envKey, this.environmentVariables[envKey]);
+        return;
       }
 
       /**
@@ -426,6 +448,41 @@ class Jarvis {
     if (!this.activeContext && !this.activeMacro) {
       return true;
     }
+  }
+
+  /**
+   * Load a provided env file
+   * Save env variables as constants
+   * returns an error for invalid env files
+   */
+  async _loadEnvFile(envFile) {
+    let fileContent;
+    try {
+      fileContent = parseScript(envFile);
+    } catch (error) {
+      return { error: 'Could not read env file from specified location!' };
+    }
+    //check whether the first and last lines of the file matches the required syntax
+    if (!(fileContent[0] === "in this context" && fileContent[fileContent.length - 1] === "end")) {
+      return { error: 'Invalid syntax in env file!' };
+    }
+    for (let line of fileContent) {
+      line = line.trim();
+      const matches = this._matchConstantFormat(line);
+      if (matches) {
+        const [, key, value] = matches;
+        this.environmentVariables[key] = value;
+      }
+    }
+    return { success: 'Successfully loaded environment file!' }
+  }
+
+  /**
+   * checks whether a given `line` is in the format of a constant definition
+   * if so returns the matches
+   */
+  _matchConstantFormat(line) {
+    return line.match(/(.+) is ['"](.+)['"]/i);
   }
 }
 

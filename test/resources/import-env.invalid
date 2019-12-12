@@ -1,0 +1,13 @@
+in this context
+    INVALID is from env
+end
+
+how to play
+    run hello
+    load $INVALID
+end
+
+start test
+    play
+end
+

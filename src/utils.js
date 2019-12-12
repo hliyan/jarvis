@@ -11,7 +11,7 @@ const tokenize = line => {
 };
 exports.tokenize = tokenize;
 
-// converts 'hello $name' to 
+// converts 'hello $name' to
 // [{value: 'hello', isArg: false}, {value: name, isArg: true}]
 const parseCommand = (commandStr) => {
   const tokens = [];
@@ -105,7 +105,7 @@ const parseScript = filename => {
   }
   const lines = content.split("\n");
   const filteredCommands = lines.filter(line => {
-    return line !== "" && !line.trim().startsWith("#");
+    return line !== "" && line.trim() !== "" && !line.trim().startsWith("#");
   });
   return filteredCommands;
 };
@@ -118,6 +118,12 @@ const validateScript = (extension, file) => {
   }
 };
 exports.validateScript = validateScript;
+
+//checks whether a given env file/file path matches to a given file name
+const validateEnvFileName = (fileName, envFile) => {
+  return envFile.split('.').pop() === fileName;
+};
+exports.validateEnvFileName = validateEnvFileName;
 
 // read and parse the JSON file
 const importJson = (filename) => {
