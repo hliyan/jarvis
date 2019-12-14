@@ -126,15 +126,17 @@ const validateEnvFileName = (fileName, envFile) => {
 exports.validateEnvFileName = validateEnvFileName;
 
 // read and parse the JSON file
+// if a valid JSON, returns the parsed JSON object
+// else returns an error object
 const importJson = (filename) => {
   try {
     const content = fs.readFileSync(filename, "utf8");
     return JSON.parse(content);
   } catch (error) {
     if (error.code === 'ENOENT') {
-      throw new Error('Could not read the JSON file from the specified location!');
+      return { error: 'Could not read the JSON file from the specified location!' };
     } else {
-      throw new Error('Invalid JSON import!');
+      return { error: 'Invalid JSON import!' };
     }
   }
 }
