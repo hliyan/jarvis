@@ -506,18 +506,12 @@ describe("JSON imports", () => {
   });
 
   test("script with a invalid JSON import", async () => {
-    try {
-      await jarvis.addScriptMode("jarvis", `${__dirname}/resources/invalid-json-import.jarvis`);
-    } catch (error) {
-      expect(error.message).toEqual('Invalid JSON import!');
-    }
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `${__dirname}/resources/invalid-json-import.jarvis`);
+    expect(scriptResponse[2]).toEqual('Invalid JSON import!');
   });
 
   test("script with a invalid JSON file path ", async () => {
-    try {
-      await jarvis.addScriptMode("jarvis", `${__dirname}/resources/invalid-json-path-import.jarvis`);
-    } catch (error) {
-      expect(error.message).toEqual('Could not read the JSON file from the specified location!');
-    }
+    const scriptResponse = await jarvis.addScriptMode("jarvis", `${__dirname}/resources/invalid-json-path-import.jarvis`);
+    expect(scriptResponse[2]).toEqual('Could not read the JSON file from the specified location!');
   });
 });

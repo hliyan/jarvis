@@ -300,9 +300,13 @@ class Jarvis {
          * checks whether the importing file is a JSON
          * if so parse the JSON file to a JSON object
          * then save the JSON object as a constant
+         * if an invalid JSON import, returns the error message
          */
         if (scriptPath && /(.)+.json$/gi.test(scriptPath)) {
           const jsonObject = importJson(scriptPath);
+          if (jsonObject.error) {
+            return jsonObject.error;
+          }
           return this._setConstantInActiveContext(resource, jsonObject);
         }
 
