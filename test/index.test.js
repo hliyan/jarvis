@@ -135,6 +135,21 @@ describe("aliases", () => {
   });
 });
 
+describe("command help", () => {
+  const jarvis = new Jarvis();
+  jarvis.addCommand({
+    command: "greet $name",
+    help: "greet 'John' - Greets a specified person",
+    handler: ({ args }) => {
+      return `Hello ${args.name}`;
+    }
+  });
+
+  test("should ", async () => {
+    expect(jarvis.commands[0].help).toEqual("greet 'John' - Greets a specified person");
+  });
+});
+
 describe('macros', () => {
   const jarvis = new Jarvis();
 
