@@ -1,4 +1,4 @@
-# J.A.R.V.I.S - Just Another Rudimentary Verbal Instruction Shell
+# J.A.R.V.I.S - Just Another Rudimentary Verbal Instruction Shell (**Beta**)
 
 ![build](https://travis-ci.org/hliyan/jarvis.svg?branch=master) 
 [![Coverage Status](https://coveralls.io/repos/github/hliyan/jarvis/badge.svg?branch=master)](https://coveralls.io/github/hliyan/jarvis?branch=master)
