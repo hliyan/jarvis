@@ -1,4 +1,4 @@
-# J.A.R.V.I.S - Just Another Rudimentary Verbal Instruction Shell (**Beta**)
+# J.A.R.V.I.S - Just Another Rudimentary Verbal Instruction Shell (BETA)
 
 ![build](https://travis-ci.org/hliyan/jarvis.svg?branch=master) 
 [![Coverage Status](https://coveralls.io/repos/github/hliyan/jarvis/badge.svg?branch=master)](https://coveralls.io/github/hliyan/jarvis?branch=master)
@@ -158,16 +158,18 @@ $ ..  # built in exit
 $ Done with repl.
 ```
 
-## Script mode (TBD)
+## Script mode
 
 You can use this to run your natural language commands as a script.
 
 Create a script file, e.g.
 
 ```
-connect to repo 'hliyan/jarvis'
-get open issues
-write issues to 'home/john/issues.json'
+start
+  connect to repo 'hliyan/jarvis'
+  get open issues
+  write issues to 'home/john/issues.json'
+end
 ```
 
 Create a script runner with the correct bindings
@@ -192,15 +194,17 @@ app.run('test.jarvis', function(input, output) {
 in this context
   HOME is 'https://foo.bar.com'
   USER is 'john'
+end
 ```
 
-## Macros and variables (TBD)
+## Macros and variables
 
 You can use this to re-use blocks of commands within a script.
 
 ```
 in this context
   PI is 3.14
+end
 
 how to get area of circle with radius $radius
   # more statements here
