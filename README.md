@@ -188,7 +188,7 @@ app.run('test.jarvis', function(input, output) {
 
 ```
 
-## Constants (TBD)
+## Constants
 
 ```
 in this context
