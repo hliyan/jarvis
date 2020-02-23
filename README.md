@@ -8,7 +8,7 @@
 JARVIS helps you write rudimentary English wrappers around libraries or APIs, like this:
 
 ```javascript
-// wrap you JavaScript function with an English API:
+// wrap your JavaScript function with an English API:
 jarvis.addCommand({
   command: '$number to the power of $power',
   handler: ({args: {number, power}}) => {
