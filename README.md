@@ -3,6 +3,17 @@
 ![build](https://travis-ci.org/hliyan/jarvis.svg?branch=master) 
 [![Coverage Status](https://coveralls.io/repos/github/hliyan/jarvis/badge.svg?branch=master)](https://coveralls.io/github/hliyan/jarvis?branch=master)
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Basic example: wrapping an existing library](#basic-example-wrapping-an-existing-library)
+- [Command line integration](#command-line-integration)
+- [Interactive CLI](#interactive-cli)
+- [Script mode](#script-mode)
+- [Constants](#constants)
+- [Macros and variables](#macros-and-variables
+
 ## Introduction
 
 JARVIS helps you write rudimentary English wrappers around libraries or APIs, like this:
