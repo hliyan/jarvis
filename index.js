@@ -54,7 +54,7 @@ class Jarvis {
    * Registers a new command with Jarvis
    * USAGE: jarvis.addCommand({ command: 'test', handler: () => {}});
    */
-  addCommand({ command, handler, aliases, help }) {
+  addCommand({ command, handler, aliases, help, description }) {
     const patterns = [];
     patterns.push({ tokens: parseCommand(command) });
     if (aliases) {
@@ -68,7 +68,9 @@ class Jarvis {
       handler: handler,
       help: help,
       tokens: parseCommand(command),
-      patterns
+      patterns,
+      description,
+      aliases
     });
   }
 
