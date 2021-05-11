@@ -69,7 +69,8 @@ class Jarvis {
       help: help,
       tokens: parseCommand(command),
       patterns,
-      description
+      description,
+      aliases
     });
   }
 
